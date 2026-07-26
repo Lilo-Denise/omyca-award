@@ -104,28 +104,33 @@ body{
 .hero-note em{color:var(--ink);font-style:italic}
 
 /* ---------- how it works ---------- */
+/* deliberately unboxed and quiet — this is a legend, not a set of buttons */
 .howto{margin-top:52px;text-align:center}
-.howto-kicker{color:var(--gold)}
+.howto-kicker{color:var(--faint)}
 .howto-grid{
   list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:1px;margin-top:20px;background:var(--line);border:1px solid var(--line);
+  gap:22px 26px;margin-top:22px;
 }
-@media(max-width:760px){.howto-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.step{background:var(--bg);padding:20px 16px 22px;text-align:left;min-width:0}
+@media(max-width:760px){.howto-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}}
+.step{text-align:left;min-width:0;border-top:1px solid var(--line);padding-top:12px}
 .step .n{
-  display:block;font:900 1.6rem/1 var(--f-sans);color:var(--gold);
+  font:900 .88rem/1 var(--f-sans);color:var(--gold);margin-right:7px;
   font-variant-numeric:tabular-nums;
 }
 .step h4{
-  font:800 .82rem/1.2 var(--f-sans);text-transform:uppercase;letter-spacing:.06em;
-  color:var(--ink);margin:12px 0 8px;
+  display:inline;font:800 .68rem/1.2 var(--f-sans);text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);
 }
-.step p{font-family:var(--f-serif);font-size:1.02rem;line-height:1.35;color:var(--muted)}
+.step p{font-family:var(--f-serif);font-size:.98rem;line-height:1.3;color:var(--faint);margin-top:7px}
 
 /* ---------- category grid ---------- */
-.cat-heading{text-align:center;margin:58px 0 0}
-.cta-line{color:var(--ink);letter-spacing:.24em}
-.cta-arrow{color:var(--gold);font:800 1.1rem var(--f-sans);margin-top:8px;animation:bob 2s ease-in-out infinite}
+.cat-heading{text-align:center;margin:64px 0 0}
+.cta-line{color:var(--gold);letter-spacing:.28em}
+.cta-head{
+  font:900 clamp(1.5rem,5.4vw,2.4rem)/1 var(--f-sans);text-transform:uppercase;
+  letter-spacing:-.02em;color:var(--ink);margin-top:12px;
+}
+.cta-arrow{color:var(--gold);font:800 1.1rem var(--f-sans);margin-top:14px;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(5px);opacity:1}}
 .cat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}
 @media(max-width:860px){.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -137,26 +142,23 @@ body{
   transition:background .22s,border-color .22s,transform .22s;
 }
 @media(max-width:360px){.cat-card{padding-left:12px;padding-right:12px}}
-.cat-card .idx{font:900 .95rem var(--f-sans);color:var(--gold)}
 .cat-card h3{
-  font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:36px 0 10px;color:var(--ink);
+  font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:0 0 10px;color:var(--ink);
   font-size:clamp(1.05rem,5.6vw,1.35rem);overflow-wrap:break-word;
 }
 .cat-card p{font-family:var(--f-serif);font-style:italic;font-size:1rem;line-height:1.4;color:var(--muted)}
-/* the meta line always hugs the bottom of the frame, so every card lines up */
+/* the action row always hugs the bottom of the frame, so every card lines up */
 .cat-card .count{
   margin-top:auto;padding-top:18px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;
   font:700 clamp(.5rem,2.5vw,.58rem) var(--f-sans);letter-spacing:.1em;
   text-transform:uppercase;color:var(--faint);
 }
-.cat-card::after{
-  content:"→";position:absolute;top:16px;right:16px;
-  font:800 1.1rem var(--f-sans);color:var(--faint);
-  transition:transform .22s,color .22s;
-}
+.cat-card .go{color:var(--gold);white-space:nowrap;transition:transform .22s}
+.cat-card .go i{font-style:normal;display:inline-block;transition:transform .22s}
 .cat-card:hover{background:var(--gold);border-color:var(--gold);transform:translateY(-3px)}
-.cat-card:hover h3,.cat-card:hover .idx,.cat-card:hover p,.cat-card:hover .count,.cat-card:hover::after{color:#141204}
-.cat-card:hover::after{transform:translateX(4px)}
+.cat-card:hover h3,.cat-card:hover p,.cat-card:hover .count,.cat-card:hover .go{color:#141204}
+.cat-card:hover .go i{transform:translateX(4px)}
 
 /* ---------- stage header ---------- */
 .stagehead{text-align:center;padding:52px 0 8px}
@@ -405,7 +407,7 @@ body{
     <section class="howto">
       <div class="smallcaps howto-kicker">How it works · about 5 minutes</div>
       <ol class="howto-grid">
-        <li class="step"><span class="n">1</span><h4>Pick a jury</h4><p>1 of 8 genres. 48 films get shortlisted.</p></li>
+        <li class="step"><span class="n">1</span><h4>Pick a category</h4><p>1 of 8. Its 48 films get shortlisted.</p></li>
         <li class="step"><span class="n">2</span><h4>Group stage</h4><p>12 groups of 4. You advance 2 from each.</p></li>
         <li class="step"><span class="n">3</span><h4>Redemption</h4><p>Revive 8 of the 24 you cut. The bracket is 32.</p></li>
         <li class="step"><span class="n">4</span><h4>Knockout</h4><p>32 → 16 → 8 → 4 → 2 → 1. Crown it, sign it, download it.</p></li>
@@ -413,7 +415,8 @@ body{
     </section>
 
     <div class="cat-heading">
-      <div class="smallcaps cta-line">Start here — pick your jury</div>
+      <div class="smallcaps cta-line">Start here</div>
+      <h2 class="cta-head">Choose <span class="goldtext">1</span> category to judge</h2>
       <div class="cta-arrow" aria-hidden="true">↓</div>
     </div>
     <div class="cat-grid" id="catGrid"></div>
@@ -631,10 +634,9 @@ function interstitial(roundLabel,line,cb){
 function renderHome(){
   $("catGrid").innerHTML = CATEGORIES.map((c,i)=>`
     <div class="cat-card" role="button" tabindex="0" aria-label="Judge the ${c.name} jury" data-cat="${c.key}">
-      <div class="idx">${String(i+1).padStart(2,"0")}</div>
       <h3>${c.short||c.name}</h3>
       <p>${c.desc}</p>
-      <div class="count">48 Films · In Session</div>
+      <div class="count"><span>48 Films</span><span class="go">Judge This <i>→</i></span></div>
     </div>`).join("");
   $("catGrid").querySelectorAll(".cat-card").forEach(el=>{
     el.addEventListener("click",()=>startCategory(el.dataset.cat));
