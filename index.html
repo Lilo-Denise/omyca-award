@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Omyca Award</title>
+<meta name="description" content="The world's most prestigious film honour, as far as we are aware.">
+<meta name="theme-color" content="#0D0D0B">
+<link rel="preconnect" href="https://image.tmdb.org">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,700;0,800;0,900;1,900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,6 90,38 50,94 10,38' fill='%23d4af37'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0D0D0B;
+  --panel:#161612;
+  --ink:#F2EEE2;
+  --muted:rgba(242,238,226,.58);
+  --faint:rgba(242,238,226,.34);
+  --gold:#E3C458;
+  --red:#E5432F;
+  --line:rgba(242,238,226,.14);
+  --f-sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --f-serif:"Instrument Serif",Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;color-scheme:dark}
+button,a,.film-card,.cat-card{touch-action:manipulation}
+.btn:focus-visible,.film-card:focus-visible,.cat-card:focus-visible,.trailer:focus-visible{
+  outline:2px solid var(--gold);outline-offset:3px;
+}
+h1,h2,h3{text-wrap:balance}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--f-sans);font-size:16px;line-height:1.55;
+  min-height:100vh;overflow-x:hidden;
+}
+#app{position:relative;max-width:1080px;margin:0 auto;padding:0 20px 90px}
+
+/* ---------- type helpers ---------- */
+.goldtext{color:var(--gold)}
+.smallcaps{
+  font-family:var(--f-sans);font-weight:600;
+  text-transform:uppercase;letter-spacing:.22em;
+  font-size:.66rem;color:var(--faint);
+}
+.rule{display:flex;align-items:center;gap:12px;justify-content:center;margin:16px auto}
+.rule::before,.rule::after{content:"";height:1px;flex:1;max-width:150px;background:var(--line)}
+.rule .gem{color:var(--gold);font-size:.7rem}
+
+/* ---------- screens ---------- */
+.screen{display:none;animation:fadeup .55s cubic-bezier(.22,.8,.3,1) both}
+.screen.active{display:block}
+@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ---------- masthead ---------- */
+.masthead{text-align:center;padding:72px 0 0}
+.masthead .pretitle{margin-bottom:28px}
+.masthead h1{
+  font-family:var(--f-sans);font-weight:900;
+  font-size:clamp(3.1rem,10.5vw,7.4rem);
+  line-height:.9;letter-spacing:-.035em;text-transform:uppercase;color:var(--ink);
+}
+.masthead h1 .star{color:var(--gold)}
+.masthead .subtitle{
+  font-family:var(--f-serif);font-style:italic;font-weight:400;
+  font-size:clamp(1.15rem,3vw,1.6rem);color:var(--muted);margin-top:26px;
+}
+.masthead .subtitle em{color:var(--ink)}
+.stamp{
+  display:inline-block;margin-top:28px;transform:rotate(-3deg);
+  border:1px solid var(--gold);color:var(--gold);border-radius:999px;
+  font:600 .62rem/1 var(--f-sans);text-transform:uppercase;letter-spacing:.18em;
+  padding:10px 16px 9px;
+}
+
+/* ---------- ticker ---------- */
+.ticker{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:44px 0 0;padding:11px 0}
+.ticker-track{display:flex;white-space:nowrap;width:max-content;animation:marquee 26s linear infinite}
+.ticker-track span{
+  font:700 .68rem/1 var(--f-sans);text-transform:uppercase;letter-spacing:.16em;
+  color:var(--muted);padding:0 26px;position:relative;
+}
+.ticker-track span::after{content:"✦";color:var(--gold);position:absolute;right:-8px;top:-1px}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+.hero-note{max-width:520px;margin:36px auto 0;text-align:center;color:var(--muted);font-size:.95rem}
+.hero-note em{color:var(--ink);font-family:var(--f-serif);font-style:italic;font-size:1.08em}
+
+/* ---------- category grid ---------- */
+.cat-heading{text-align:center;margin:58px 0 0}
+.cat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}
+@media(max-width:860px){.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat-card{
+  min-width:0;position:relative;background:var(--panel);
+  border:1px solid var(--line);
+  padding:20px 16px 18px;text-align:left;cursor:pointer;
+  transition:background .22s,border-color .22s,transform .22s;
+}
+.cat-card .idx{font:900 .95rem var(--f-sans);color:var(--gold)}
+.cat-card h3{font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:36px 0 10px;color:var(--ink)}
+.cat-card p{font-family:var(--f-serif);font-style:italic;font-size:1rem;line-height:1.4;color:var(--muted);min-height:4.2em}
+.cat-card .count{margin-top:16px;font:700 .58rem var(--f-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.cat-card::after{
+  content:"→";position:absolute;top:16px;right:16px;
+  font:800 1.1rem var(--f-sans);color:var(--faint);
+  transition:transform .22s,color .22s;
+}
+.cat-card:hover{background:var(--gold);border-color:var(--gold);transform:translateY(-3px)}
+.cat-card:hover h3,.cat-card:hover .idx,.cat-card:hover p,.cat-card:hover .count,.cat-card:hover::after{color:#141204}
+.cat-card:hover::after{transform:translateX(4px)}
+
+/* ---------- stage header ---------- */
+.stagehead{text-align:center;padding:52px 0 8px}
+.stagehead .categoryline{margin-bottom:16px}
+.stagehead h2{
+  font:900 clamp(2rem,6.5vw,3.4rem)/0.95 var(--f-sans);
+  text-transform:uppercase;letter-spacing:-.02em;color:var(--ink);
+}
+.stagehead .direction{font-family:var(--f-serif);font-style:italic;color:var(--muted);margin-top:14px;font-size:1.12rem}
+.progressline{margin-top:16px;font:700 .62rem var(--f-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--faint);font-variant-numeric:tabular-nums}
+.progressbar{width:min(320px,70%);height:2px;background:var(--line);margin:12px auto 0;position:relative}
+.progressbar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);transition:width .4s ease}
+
+/* ---------- film cards ---------- */
+.film-grid{display:grid;gap:12px;margin-top:30px}
+.film-grid.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:760px){.film-grid.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.film-card{
+  min-width:0;position:relative;background:var(--panel);
+  border:1px solid var(--line);cursor:pointer;
+  transition:transform .25s,border-color .25s;
+}
+.film-card:hover{transform:translateY(-4px);border-color:rgba(227,196,88,.65)}
+.film-card.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.film-card.selected::after{
+  content:"IN ✓";position:absolute;top:-9px;left:-9px;z-index:3;transform:rotate(-6deg);
+  background:var(--gold);color:#141204;
+  font:800 .62rem var(--f-sans);letter-spacing:.1em;padding:6px 9px 5px;
+}
+.posterbox{position:relative;aspect-ratio:2/3;background:#0a0a08;overflow:hidden}
+.posterbox img{width:100%;height:100%;object-fit:cover;display:block}
+.posterbox .fallback{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;
+  padding:14px;background:var(--panel);
+  font-family:var(--f-serif);font-size:1.15rem;line-height:1.3;color:var(--gold);
+}
+.posterbox.noimg img{display:none}
+.posterbox.noimg .fallback{display:flex}
+.film-meta{padding:12px 10px 12px;text-align:center}
+.film-meta .t{
+  font-family:var(--f-serif);font-size:1.1rem;line-height:1.2;
+  min-height:2.4em;display:flex;align-items:center;justify-content:center;
+}
+.film-meta .y{font:700 .6rem var(--f-sans);letter-spacing:.22em;color:var(--faint);margin-top:5px;font-variant-numeric:tabular-nums}
+.trailer{
+  margin-top:9px;display:inline-block;cursor:pointer;background:none;
+  font:700 .58rem var(--f-sans);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  border:1px solid var(--line);padding:7px 10px 6px;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.trailer:hover{background:var(--ink);border-color:var(--ink);color:#141204}
+
+/* ---------- duel ---------- */
+.duel-wrap{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;
+  max-width:780px;margin:34px auto 0;
+}
+@media(max-width:680px){
+  .duel-wrap{grid-template-columns:1fr;gap:8px}
+  .vs-medal{margin:0 auto}
+}
+.duel-wrap .film-card{max-width:330px;margin:0 auto;width:100%}
+.vs-medal{padding:0 8px}
+.vs-medal span{font:900 italic 1.7rem var(--f-sans);color:var(--red);text-transform:uppercase}
+.duel-note{text-align:center;margin-top:28px;font-family:var(--f-serif);font-style:italic;color:var(--muted);font-size:1.05rem}
+
+/* ---------- buttons ---------- */
+.actionbar{position:sticky;bottom:0;padding:16px 0 24px;text-align:center;z-index:5;
+  background:linear-gradient(180deg,transparent,rgba(13,13,11,.94) 42%)}
+.btn{
+  display:inline-block;border:none;cursor:pointer;
+  font:800 .72rem var(--f-sans);letter-spacing:.14em;text-transform:uppercase;
+  padding:16px 30px 15px;min-height:44px;
+  transition:transform .2s,opacity .2s,background .2s,color .2s,border-color .2s;
+}
+.btn-gold{background:var(--gold);color:#141204}
+.btn-gold:hover{transform:translateY(-2px);background:var(--ink)}
+.btn-gold:disabled{opacity:.22;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.counter-chip{
+  display:inline-block;margin-bottom:12px;
+  font:700 .62rem var(--f-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.counter-chip b{color:var(--gold)}
+
+/* ---------- interstitial ---------- */
+#interstitial{
+  position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+  background:rgba(10,10,8,.97);text-align:center;padding:30px;cursor:pointer;
+}
+#interstitial.on{display:flex}
+#interstitial .inner{max-width:680px;animation:fadeup .8s .05s both}
+#interstitial .roundname{margin-bottom:22px;color:var(--gold)}
+#interstitial h3{
+  font-family:var(--f-serif);font-style:italic;font-weight:400;
+  font-size:clamp(1.7rem,5.4vw,2.8rem);line-height:1.25;
+}
+#interstitial .hint{margin-top:36px;font:700 .6rem var(--f-sans);letter-spacing:.26em;text-transform:uppercase;color:var(--faint);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);
+  background:var(--ink);color:#141204;
+  font:600 .82rem var(--f-sans);padding:13px 20px;z-index:80;opacity:0;pointer-events:none;
+  transition:opacity .35s,transform .35s;max-width:86vw;text-align:center;
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- ceremony ---------- */
+#screen-ceremony{min-height:88vh}
+.ceremony-stage{position:relative;text-align:center;padding-top:48px;min-height:70vh}
+.spotlight{display:none}
+.announce{
+  font-family:var(--f-serif);font-style:italic;
+  font-size:clamp(1.2rem,3.6vw,1.7rem);color:var(--muted);
+  opacity:0;transition:opacity 1.2s ease;min-height:2.2em;padding:0 12px;
+}
+.announce.on{opacity:1}
+.champ-wrap{
+  position:relative;width:min(280px,64vw);margin:36px auto 0;
+  opacity:0;transform:translateY(20px) scale(.97);
+  transition:opacity 1.3s ease,transform 1.3s cubic-bezier(.22,.8,.3,1);
+}
+.champ-wrap.on{opacity:1;transform:none}
+.champ-wrap .posterframe{position:relative;border:1px solid var(--line);padding:8px;background:var(--panel)}
+.champ-wrap .posterbox{aspect-ratio:2/3}
+.crown{
+  position:absolute;left:50%;top:-46px;transform:translate(-50%,-140px) rotate(-6deg);
+  width:84px;height:auto;opacity:0;z-index:5;pointer-events:none;
+  filter:drop-shadow(0 8px 20px rgba(227,196,88,.45));
+}
+.crown.dropped{
+  opacity:1;transform:translate(-50%,0) rotate(0);
+  transition:transform .9s cubic-bezier(.34,1.45,.5,1),opacity .3s;
+}
+.crown-cta{margin-top:32px;opacity:0;transition:opacity .9s ease}
+.crown-cta.on{opacity:1}
+.crown-cta .lead{font-family:var(--f-serif);font-style:italic;color:var(--muted);margin-bottom:16px;font-size:1.08rem}
+.champ-title{
+  font:900 clamp(1.8rem,5.6vw,3rem)/1 var(--f-sans);
+  text-transform:uppercase;letter-spacing:-.02em;color:var(--ink);
+  margin-top:28px;opacity:0;transition:opacity 1s ease;
+}
+.champ-title.on{opacity:1}
+.champ-sub{margin-top:10px;opacity:0;transition:opacity 1s .2s ease;color:var(--gold)}
+.champ-sub.on{opacity:1}
+.speech{
+  max-width:540px;margin:30px auto 0;padding:26px 26px 22px;
+  border:1px solid var(--line);background:var(--panel);
+  font-family:var(--f-serif);font-style:italic;font-size:1.18rem;line-height:1.55;color:var(--ink);
+  opacity:0;transform:translateY(12px);transition:opacity 1s ease,transform 1s ease;
+}
+.speech.on{opacity:1;transform:none}
+.speech::before{
+  content:"— The Acceptance, as recorded —";display:block;
+  font:700 .56rem var(--f-sans);font-style:normal;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:14px;
+}
+.sign-block{margin:32px auto 0;max-width:340px;opacity:0;transition:opacity .9s ease}
+.sign-block.on{opacity:1}
+.sign-block label{display:block;margin-bottom:10px}
+#judgeName{
+  width:100%;background:transparent;border:none;border-bottom:1px solid var(--gold);
+  font-family:var(--f-serif);font-style:italic;font-size:1.35rem;color:var(--ink);
+  text-align:center;padding:6px 4px 9px;outline:none;border-radius:0;
+}
+#judgeName:focus{border-bottom:2px solid var(--gold);padding-bottom:8px}
+#judgeName::placeholder{color:var(--faint);font-size:1.05rem}
+.ceremony-actions{margin-top:34px;opacity:0;transition:opacity .9s ease;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ceremony-actions.on{opacity:1}
+.particles{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:6}
+.particles i{
+  position:absolute;width:5px;height:5px;background:var(--gold);
+  transform:rotate(45deg);opacity:0;animation:burst 1.4s ease-out forwards;
+}
+@keyframes burst{
+  0%{opacity:1;transform:translate(0,0) rotate(45deg) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(220deg) scale(.4)}
+}
+
+/* ---------- recap ---------- */
+#recap-panel{display:none;text-align:center;padding-top:34px}
+#recap-panel.on{display:block;animation:fadeup .6s both}
+#recapCanvas{width:min(540px,92vw);height:auto;border:1px solid var(--line)}
+.recap-actions{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- hero poster fan ---------- */
+.fan{display:flex;justify-content:center;align-items:flex-end;margin:36px auto 6px;min-height:170px}
+.fan .fp{
+  width:clamp(84px,13vw,124px);flex:none;margin:0 -15px;position:relative;
+  border:2px solid var(--ink);background:#000;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.9);
+  transform:rotate(var(--r)) translateY(var(--ty));
+  transition:transform .3s cubic-bezier(.22,.8,.3,1),z-index 0s;
+}
+.fan .fp:hover{transform:rotate(0) translateY(calc(var(--ty) - 18px));z-index:9}
+.fan .fp img{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover}
+.fan .fp .tag{
+  position:absolute;top:-10px;left:-10px;transform:rotate(-8deg);
+  background:var(--gold);color:#141204;
+  font:800 .52rem var(--f-sans);letter-spacing:.08em;padding:4px 7px 3px;
+}
+
+/* ---------- poster marquee ---------- */
+.mq-label{text-align:center;margin:26px 0 0}
+.marquee{overflow:hidden;margin-top:14px}
+.marquee-track{display:flex;gap:12px;width:max-content;animation:marquee 55s linear infinite}
+.mq-poster{width:92px;flex:none;border:1px solid var(--line);background:#000;transform:rotate(-1.6deg)}
+.mq-poster:nth-child(even){transform:rotate(1.6deg)}
+.mq-poster img{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;filter:grayscale(45%);transition:filter .3s}
+.mq-poster:hover img{filter:none}
+
+/* ---------- footer ---------- */
+.colophon{margin-top:96px;text-align:center;color:var(--faint);font:500 .68rem/1.9 var(--f-sans);letter-spacing:.05em}
+.colophon .sep{color:var(--gold);margin:0 8px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <section class="screen active" id="screen-home">
+    <header class="masthead">
+      <div class="pretitle smallcaps">By Appointment To Absolutely No One</div>
+      <h1>THE OMYCA<br>AWARD<span class="star">✦</span></h1>
+      <p class="subtitle">The world's most prestigious film honour, <em>as far as we are aware.</em></p>
+      <div class="fan" id="heroFan" aria-hidden="true"></div>
+      <div class="stamp">Est. this morning — a heritage of nearly several hours</div>
+    </header>
+    <div class="ticker" aria-hidden="true"><div class="ticker-track">
+      <span>No critics</span><span>No juries</span><span>One judge — you, evidently</span><span>48 films</span><span>One diamond</span><span>Taste: questionable</span><span>Verdict: final</span><span>Dress code: optional</span>
+      <span>No critics</span><span>No juries</span><span>One judge — you, evidently</span><span>48 films</span><span>One diamond</span><span>Taste: questionable</span><span>Verdict: final</span><span>Dress code: optional</span>
+    </div></div>
+    <div class="mq-label smallcaps">The shortlist, assembling itself in no particular order</div>
+    <div class="marquee" aria-hidden="true"><div class="marquee-track" id="mqRow"></div></div>
+
+    <p class="hero-note">
+      Tonight, the Committee has appointed a single judge of impeccable taste — <em>you, evidently</em>.
+      Forty-eight films enter the bracket. One shall receive the Diamond.
+      Kindly select the jury you are prepared to preside over.
+    </p>
+
+    <div class="cat-heading">
+      <div class="smallcaps">You are the judge of</div>
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+
+    <footer class="colophon">
+      THE OMYCA AWARD<span class="sep">◆</span>A COMMITTEE OF ONE<br>
+      Entirely unaffiliated with any similarly named ceremony.<br>
+      Any resemblance is a coincidence we are rather pleased with.
+    </footer>
+  </section>
+
+  <!-- ═══════════ GROUP STAGE ═══════════ -->
+  <section class="screen" id="screen-groups">
+    <header class="stagehead">
+      <div class="categoryline smallcaps" id="groupCatLine"></div>
+      <h2 class="goldtext" id="groupTitle">GROUP I OF XII</h2>
+      <p class="direction">Four candidates stand before you. Advance the two least disappointing.</p>
+      <div class="progressline" id="groupProgressText"></div>
+      <div class="progressbar"><i id="groupProgressFill"></i></div>
+    </header>
+    <div class="film-grid g4" id="groupGrid"></div>
+    <div class="actionbar">
+      <div><span class="counter-chip" id="groupCounter"><b>0</b> of 2 chosen</span></div>
+      <button class="btn btn-gold" id="groupConfirm" disabled>The Committee Concurs</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ REDEMPTION ═══════════ -->
+  <section class="screen" id="screen-redemption">
+    <header class="stagehead">
+      <div class="categoryline smallcaps" id="redCatLine"></div>
+      <h2 class="goldtext">THE SECOND CHANCES COMMITTEE</h2>
+      <p class="direction">Twenty-four films were dismissed. Eight shall be graciously un-eliminated.<br>Choose responsibly, or at least convincingly.</p>
+    </header>
+    <div class="film-grid g4" id="redGrid"></div>
+    <div class="actionbar">
+      <div><span class="counter-chip" id="redCounter"><b>0</b> of 8 pardoned</span></div>
+      <button class="btn btn-gold" id="redConfirm" disabled>Grant Clemency</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ DUEL ═══════════ -->
+  <section class="screen" id="screen-duel">
+    <header class="stagehead">
+      <div class="categoryline smallcaps" id="duelCatLine"></div>
+      <h2 class="goldtext" id="duelRoundTitle">ROUND OF 32</h2>
+      <div class="progressline" id="duelProgressText"></div>
+      <div class="progressbar"><i id="duelProgressFill"></i></div>
+    </header>
+    <div class="duel-wrap" id="duelWrap"></div>
+    <p class="duel-note">Choose. The Committee will pretend not to judge you.</p>
+  </section>
+
+  <!-- ═══════════ CEREMONY ═══════════ -->
+  <section class="screen" id="screen-ceremony">
+    <div class="ceremony-stage" id="ceremonyStage">
+      <div class="spotlight"></div>
+      <p class="announce" id="announceLine">By unanimous decision of a committee of one…</p>
+      <div class="champ-wrap" id="champWrap">
+        <svg class="crown" id="crownSvg" aria-hidden="true" viewBox="0 0 100 62" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="crGold" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f6e7b6"/><stop offset=".5" stop-color="#d4af37"/><stop offset="1" stop-color="#8a6a1e"/>
+            </linearGradient>
+          </defs>
+          <path d="M8 50 L4 16 L26 32 L50 6 L74 32 L96 16 L92 50 Z" fill="url(#crGold)"/>
+          <rect x="8" y="50" width="84" height="8" fill="url(#crGold)"/>
+          <circle cx="50" cy="20" r="4" fill="#fdf6dd"/>
+          <circle cx="15" cy="27" r="3" fill="#fdf6dd"/>
+          <circle cx="85" cy="27" r="3" fill="#fdf6dd"/>
+        </svg>
+        <div class="particles" id="particles"></div>
+        <div class="posterframe" id="champPosterFrame"></div>
+      </div>
+      <div class="crown-cta" id="crownCta">
+        <p class="lead">The Diamond awaits. You may now do the honours.</p>
+        <button class="btn btn-gold" id="crownBtn">Bestow the Crown</button>
+      </div>
+      <h2 class="champ-title goldtext" id="champTitle"></h2>
+      <div class="champ-sub smallcaps" id="champSub"></div>
+      <div class="speech" id="speechBox"></div>
+      <div class="sign-block" id="signBlock">
+        <label class="smallcaps" for="judgeName">The presiding judge, for the record</label>
+        <input id="judgeName" name="judge-name" type="text" maxlength="24" placeholder="Your name, your honour…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="ceremony-actions" id="ceremonyActions">
+        <button class="btn btn-gold" id="recapBtn">Review the Road to Glory</button>
+        <button class="btn btn-ghost" id="restartBtn">Convene a New Jury</button>
+      </div>
+    </div>
+
+    <div id="recap-panel">
+      <div class="smallcaps" style="margin-bottom:18px">The Official Record</div>
+      <canvas id="recapCanvas" width="1080" height="1440"></canvas>
+      <div class="recap-actions">
+        <button class="btn btn-gold" id="dlRecordBtn">Download the Official Record</button>
+        <button class="btn btn-ghost" id="restartBtn2">Convene a New Jury</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="interstitial"><div class="inner">
+  <div class="roundname smallcaps" id="interRound"></div>
+  <h3 id="interLine"></h3>
+  <div class="hint">Tap to proceed</div>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ══════════════════ DATA ══════════════════ */
+const FILMS = /*__FILM_DATA__*/ {"action":[{"t":"Die Hard","y":1988,"p":"https://image.tmdb.org/t/p/w500/7Bjd8kfmDSOzpmhySpEhkUyK2oH.jpg"},{"t":"Mad Max: Fury Road","y":2015,"p":"https://image.tmdb.org/t/p/w500/ulcAi4dKpAjHwYGS08vNyx9H6I9.jpg"},{"t":"The Dark Knight","y":2008,"p":"https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"},{"t":"Terminator 2: Judgment Day","y":1991,"p":"https://image.tmdb.org/t/p/w500/jFTVD4XoWQTcg7wdyJKa8PEds5q.jpg"},{"t":"Gladiator","y":2000,"p":"https://image.tmdb.org/t/p/w500/wN2xWp1eIwCKOD0BHTcErTBv1Uq.jpg"},{"t":"John Wick","y":2014,"p":"https://image.tmdb.org/t/p/w500/wXqWR7dHncNRbxoEGybEy7QTe9h.jpg"},{"t":"Mission: Impossible – Fallout","y":2018,"p":"https://image.tmdb.org/t/p/w500/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg"},{"t":"Top Gun: Maverick","y":2022,"p":"https://image.tmdb.org/t/p/w500/n0YuM4f5lvGAP6MAW2kBIzugXnc.jpg"},{"t":"Raiders of the Lost Ark","y":1981,"p":"https://image.tmdb.org/t/p/w500/ceG9VzoRAVGwivFU403Wc3AHRys.jpg"},{"t":"Aliens","y":1986,"p":"https://image.tmdb.org/t/p/w500/r1x5JGpyqZU8PYhbs4UcrO1Xb6x.jpg"},{"t":"Speed","y":1994,"p":"https://image.tmdb.org/t/p/w500/82PkCE4R95KhHICUDF7G4Ly2z3l.jpg"},{"t":"The Bourne Identity","y":2002,"p":"https://image.tmdb.org/t/p/w500/aP8swke3gmowbkfZ6lmNidu0y9p.jpg"},{"t":"Casino Royale","y":2006,"p":"https://image.tmdb.org/t/p/w500/lMrxYKKhd4lqRzwUHAy5gcx9PSO.jpg"},{"t":"Skyfall","y":2012,"p":"https://image.tmdb.org/t/p/w500/d0IVecFQvsGdSbnMAHqiYsNYaJT.jpg"},{"t":"Kill Bill: Vol. 1","y":2003,"p":"https://image.tmdb.org/t/p/w500/v7TaX8kXMXs5yFFGR41guUDNcnB.jpg"},{"t":"Avengers: Endgame","y":2019,"p":"https://image.tmdb.org/t/p/w500/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg"},{"t":"Black Panther","y":2018,"p":"https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg"},{"t":"Wonder Woman","y":2017,"p":"https://image.tmdb.org/t/p/w500/v4ncgZjG2Zu8ZW5al1vIZTsSjqX.jpg"},{"t":"Spider-Man: No Way Home","y":2021,"p":"https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg"},{"t":"The Raid","y":2011,"p":"https://image.tmdb.org/t/p/w500/Abnm1Ws3JH0ReCfEhLMPwPcMcGO.jpg"},{"t":"Crouching Tiger, Hidden Dragon","y":2000,"p":"https://image.tmdb.org/t/p/w500/iNDVBFNz4XyYzM9Lwip6atSTFqf.jpg"},{"t":"Hero","y":2002,"p":"https://image.tmdb.org/t/p/w500/vxgZto2Cz7ILHAlmRXt50I2brB2.jpg"},{"t":"Ip Man","y":2008,"p":"https://image.tmdb.org/t/p/w500/9bUIrDKnesNbBL1nAl1nt7gtocE.jpg"},{"t":"Enter the Dragon","y":1973,"p":"https://image.tmdb.org/t/p/w500/fyrh2ULEcmLpGTVLPQqFW45hqr5.jpg"},{"t":"First Blood","y":1982,"p":"https://image.tmdb.org/t/p/w500/a9sa6ERZCpplbPEO7OMWE763CLD.jpg"},{"t":"Predator","y":1987,"p":"https://image.tmdb.org/t/p/w500/aN3cdjIK70KGmD84et8MMblU87Q.jpg"},{"t":"RoboCop","y":1987,"p":"https://image.tmdb.org/t/p/w500/hHtOgGb3NihlyRATHlKPaFApbrd.jpg"},{"t":"Lethal Weapon","y":1987,"p":"https://image.tmdb.org/t/p/w500/fTq4ThIP3pQTYR9eDepsbDHqdcs.jpg"},{"t":"Point Break","y":1991,"p":"https://image.tmdb.org/t/p/w500/tlbERIghrQ4oofqlbF7H0K0EYnx.jpg"},{"t":"Face/Off","y":1997,"p":"https://image.tmdb.org/t/p/w500/69Xzn8UdPbVnmqSChKz2RTpoNfB.jpg"},{"t":"Con Air","y":1997,"p":"https://image.tmdb.org/t/p/w500/kOKjgrEzGOP92rVQ6srA9jtp60l.jpg"},{"t":"The Rock","y":1996,"p":"https://image.tmdb.org/t/p/w500/eBcoxveWzzXQrCrwWMGAROcqgpP.jpg"},{"t":"Heat","y":1995,"p":"https://image.tmdb.org/t/p/w500/umSVjVdbVwtx5ryCA2QXL44Durm.jpg"},{"t":"Léon: The Professional","y":1994,"p":"https://image.tmdb.org/t/p/w500/bxB2q91nKYp8JNzqE7t7TWBVupB.jpg"},{"t":"300","y":2006,"p":"https://image.tmdb.org/t/p/w500/h7Lcio0c9ohxPhSZg42eTlKIVVY.jpg"},{"t":"Fast Five","y":2011,"p":"https://image.tmdb.org/t/p/w500/gEfQjjQwY7fh5bI4GlG0RrBu7Pz.jpg"},{"t":"Furious 7","y":2015,"p":"https://image.tmdb.org/t/p/w500/ktofZ9Htrjiy0P6LEowsDaxd3Ri.jpg"},{"t":"Edge of Tomorrow","y":2014,"p":"https://image.tmdb.org/t/p/w500/nBM9MMa2WCwvMG4IJ3eiGUdbPe6.jpg"},{"t":"Baby Driver","y":2017,"p":"https://image.tmdb.org/t/p/w500/tYzFuYXmT8LOYASlFCkaPiAFAl0.jpg"},{"t":"Atomic Blonde","y":2017,"p":"https://image.tmdb.org/t/p/w500/kV9R5h0Yct1kR8Hf8sJ1nX0Vz4x.jpg"},{"t":"Extraction","y":2020,"p":"https://image.tmdb.org/t/p/w500/nygOUcBKPHFTbxsYRFZVePqgPK6.jpg"},{"t":"Nobody","y":2021,"p":"https://image.tmdb.org/t/p/w500/oBgWY00bEFeZ9N25wWVyuQddbAo.jpg"},{"t":"The Equalizer","y":2014,"p":"https://image.tmdb.org/t/p/w500/9u4yW7yPA0BQ2pv9XwiNzItwvp8.jpg"},{"t":"Taken","y":2008,"p":"https://image.tmdb.org/t/p/w500/ognkaUSNgJe1a2pjB4UNdzEo5jT.jpg"},{"t":"Dredd","y":2012,"p":"https://image.tmdb.org/t/p/w500/wLx65gtGVnUFCxceHWGszcruCZj.jpg"},{"t":"The Expendables","y":2010,"p":"https://image.tmdb.org/t/p/w500/j09ZkH6R4JWVylBcDai1laCmGw7.jpg"},{"t":"Mission: Impossible","y":1996,"p":"https://image.tmdb.org/t/p/w500/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg"},{"t":"True Lies","y":1994,"p":"https://image.tmdb.org/t/p/w500/pweFTnzzTfGK68woSVkiTgjLzWm.jpg"}],"comedy":[{"t":"Superbad","y":2007,"p":"https://image.tmdb.org/t/p/w500/ek8e8txUyUwd2BNqj6lFEerJfbq.jpg"},{"t":"The Hangover","y":2009,"p":"https://image.tmdb.org/t/p/w500/A0uS9rHR56FeBtpjVki16M5xxSW.jpg"},{"t":"Bridesmaids","y":2011,"p":"https://image.tmdb.org/t/p/w500/gJtA7hYsBMQ7EM3sPBMUdBfU7a0.jpg"},{"t":"Anchorman: The Legend of Ron Burgundy","y":2004,"p":"https://image.tmdb.org/t/p/w500/mhZIcRePT7U8viFQVjt1ZjYIsR4.jpg"},{"t":"Step Brothers","y":2008,"p":"https://image.tmdb.org/t/p/w500/nvggBbEraUTAVR6ffP3AaBUWSHs.jpg"},{"t":"Dumb and Dumber","y":1994,"p":"https://image.tmdb.org/t/p/w500/4LdpBXiCyGKkR8FGHgjKlphrfUc.jpg"},{"t":"Groundhog Day","y":1993,"p":"https://image.tmdb.org/t/p/w500/gCgt1WARPZaXnq523ySQEUKinCs.jpg"},{"t":"Mrs. Doubtfire","y":1993,"p":"https://image.tmdb.org/t/p/w500/shHrSmXS5140o6sQzgzXxn3KqSm.jpg"},{"t":"Home Alone","y":1990,"p":"https://image.tmdb.org/t/p/w500/onTSipZ8R3bliBdKfPtsDuHTdlL.jpg"},{"t":"Ferris Bueller's Day Off","y":1986,"p":"https://image.tmdb.org/t/p/w500/9LTQNCvoLsKXP0LtaKAaYVtRaQL.jpg"},{"t":"The Grand Budapest Hotel","y":2014,"p":"https://image.tmdb.org/t/p/w500/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg"},{"t":"Monty Python and the Holy Grail","y":1975,"p":"https://image.tmdb.org/t/p/w500/7nTkHjETdGMYK1phHwDbPsrzbYl.jpg"},{"t":"Airplane!","y":1980,"p":"https://image.tmdb.org/t/p/w500/7Q3efxd3AF1vQjlSxnlerSA7RzN.jpg"},{"t":"The Big Lebowski","y":1998,"p":"https://image.tmdb.org/t/p/w500/3bv6WAp6BSxxYvB5ozKFUYuRA8C.jpg"},{"t":"Napoleon Dynamite","y":2004,"p":"https://image.tmdb.org/t/p/w500/6Iv6Uwa2SBLN0dSGM00rdrwN4MJ.jpg"},{"t":"Mean Girls","y":2004,"p":"https://image.tmdb.org/t/p/w500/2ZkuQXvVhh45uSvkBej4S7Ix1NJ.jpg"},{"t":"Legally Blonde","y":2001,"p":"https://image.tmdb.org/t/p/w500/9ohlMrJHQqKhfUKh7Zr3JQqHNLZ.jpg"},{"t":"Clueless","y":1995,"p":"https://image.tmdb.org/t/p/w500/8AwVTcgpTnmeOs4TdTWqcFDXEsA.jpg"},{"t":"Zoolander","y":2001,"p":"https://image.tmdb.org/t/p/w500/qdrbSneHZjJG2Dj0hhBxzzAo4HB.jpg"},{"t":"Elf","y":2003,"p":"https://image.tmdb.org/t/p/w500/oOleziEempUPu96jkGs0Pj6tKxj.jpg"},{"t":"School of Rock","y":2003,"p":"https://image.tmdb.org/t/p/w500/zXLXaepIBvFVLU25DH3wv4IPSbe.jpg"},{"t":"Borat","y":2006,"p":"https://image.tmdb.org/t/p/w500/7g9kBHMN2KTr5KUf8aen187Mdn.jpg"},{"t":"Tropic Thunder","y":2008,"p":"https://image.tmdb.org/t/p/w500/zAurB9mNxfYRoVrVjAJJwGV3sPg.jpg"},{"t":"21 Jump Street","y":2012,"p":"https://image.tmdb.org/t/p/w500/8v3Sqv9UcIUC4ebmpKWROqPBINZ.jpg"},{"t":"The Nice Guys","y":2016,"p":"https://image.tmdb.org/t/p/w500/clq4So9spa9cXk3MZy2iMdqkxP2.jpg"},{"t":"Game Night","y":2018,"p":"https://image.tmdb.org/t/p/w500/85R8LMyn9f2Lev2YPBF8Nughrkv.jpg"},{"t":"Booksmart","y":2019,"p":"https://image.tmdb.org/t/p/w500/2aSxRDmisJP90H3S0aocyuQIe4z.jpg"},{"t":"Jojo Rabbit","y":2019,"p":"https://image.tmdb.org/t/p/w500/1mqL7VG4Ix8wmxwypmCA1HTHBky.jpg"},{"t":"Deadpool","y":2016,"p":"https://image.tmdb.org/t/p/w500/3E53WEZJqP6aM84D8CckXx4pIHw.jpg"},{"t":"Hot Fuzz","y":2007,"p":"https://image.tmdb.org/t/p/w500/zPib4ukTSdXvHP9pxGkFCe34f3y.jpg"},{"t":"Shaun of the Dead","y":2004,"p":"https://image.tmdb.org/t/p/w500/dgXPhzNJH8HFTBjXPB177yNx6RI.jpg"},{"t":"In Bruges","y":2008,"p":"https://image.tmdb.org/t/p/w500/vz3Vd6nfq9YZrVvyYx5RHFaYKV3.jpg"},{"t":"The Truman Show","y":1998,"p":"https://image.tmdb.org/t/p/w500/vuza0WqY239yBXOadKlGwJsZJFE.jpg"},{"t":"Liar Liar","y":1997,"p":"https://image.tmdb.org/t/p/w500/p1habYSdC7oD3WygQ5lynU5G5rV.jpg"},{"t":"Ace Ventura: Pet Detective","y":1994,"p":"https://image.tmdb.org/t/p/w500/pqiRuETmuSybfnVZ7qyeoXhQyN1.jpg"},{"t":"The Mask","y":1994,"p":"https://image.tmdb.org/t/p/w500/jPC2eYub74zwf2tPGVtzSlBW6Oy.jpg"},{"t":"Rush Hour","y":1998,"p":"https://image.tmdb.org/t/p/w500/nwPhAsfnb7f46bZkWLG7IRP5HXr.jpg"},{"t":"Coming to America","y":1988,"p":"https://image.tmdb.org/t/p/w500/8YZiA1o264dk0cr1USyMdph6SZl.jpg"},{"t":"Beverly Hills Cop","y":1984,"p":"https://image.tmdb.org/t/p/w500/eBJEvKkhQ0tUt1dBAcTEYW6kCle.jpg"},{"t":"Ghostbusters","y":1984,"p":"https://image.tmdb.org/t/p/w500/7E8nLijS9AwwUEPu2oFYOVKhdFA.jpg"},{"t":"Caddyshack","y":1980,"p":"https://image.tmdb.org/t/p/w500/lXnNz7zOXCsftMDVoU3VSo0Eioi.jpg"},{"t":"Blazing Saddles","y":1974,"p":"https://image.tmdb.org/t/p/w500/vNw1gOEDdYTDeNMuuq8OmiEHrfH.jpg"},{"t":"Some Like It Hot","y":1959,"p":"https://image.tmdb.org/t/p/w500/hVIKyTK13AvOGv7ICmJjK44DTzp.jpg"},{"t":"The Wolf of Wall Street","y":2013,"p":"https://image.tmdb.org/t/p/w500/kW9LmvYHAaS9iA0tHmZVq8hQYoq.jpg"},{"t":"Ted","y":2012,"p":"https://image.tmdb.org/t/p/w500/1QVZXQQHCEIj8lyUhdBYd2qOYtq.jpg"},{"t":"We're the Millers","y":2013,"p":"https://image.tmdb.org/t/p/w500/qF2LJ0jwWrtXSuT4AFD5OS2IqaT.jpg"},{"t":"Barbie","y":2023,"p":"https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg"},{"t":"Free Guy","y":2021,"p":"https://image.tmdb.org/t/p/w500/dxraF0qPr1OEgJk17ltQTO84kQF.jpg"}],"drama":[{"t":"The Shawshank Redemption","y":1994,"p":"https://image.tmdb.org/t/p/w500/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg"},{"t":"Forrest Gump","y":1994,"p":"https://image.tmdb.org/t/p/w500/Cw4hIUIAmSYfK9QfaUW5igp9La.jpg"},{"t":"The Godfather","y":1972,"p":"https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg"},{"t":"Schindler's List","y":1993,"p":"https://image.tmdb.org/t/p/w500/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg"},{"t":"Fight Club","y":1999,"p":"https://image.tmdb.org/t/p/w500/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg"},{"t":"Good Will Hunting","y":1997,"p":"https://image.tmdb.org/t/p/w500/z2FnLKpFi1HPO7BEJxdkv6hpJSU.jpg"},{"t":"A Beautiful Mind","y":2001,"p":"https://image.tmdb.org/t/p/w500/rEIg5yJdNOt9fmX4P8gU9LeNoTQ.jpg"},{"t":"The Green Mile","y":1999,"p":"https://image.tmdb.org/t/p/w500/8VG8fDNiy50H4FedGwdSVUPoaJe.jpg"},{"t":"12 Years a Slave","y":2013,"p":"https://image.tmdb.org/t/p/w500/xdANQijuNrJaw1HA61rDccME4Tm.jpg"},{"t":"Moonlight","y":2016,"p":"https://image.tmdb.org/t/p/w500/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg"},{"t":"Manchester by the Sea","y":2016,"p":"https://image.tmdb.org/t/p/w500/o9VXYOuaJxCEKOxbA86xqtwmqYn.jpg"},{"t":"The Pursuit of Happyness","y":2006,"p":"https://image.tmdb.org/t/p/w500/lBYOKAMcxIvuk9s9hMuecB9dPBV.jpg"},{"t":"Dead Poets Society","y":1989,"p":"https://image.tmdb.org/t/p/w500/tNvKkSnnn4Z6RCBThyK1gfCSSvv.jpg"},{"t":"Rain Man","y":1988,"p":"https://image.tmdb.org/t/p/w500/iTNHwO896WKkaoPtpMMS74d8VNi.jpg"},{"t":"One Flew Over the Cuckoo's Nest","y":1975,"p":"https://image.tmdb.org/t/p/w500/kjWsMh72V6d8KRLV4EOoSJLT1H7.jpg"},{"t":"12 Angry Men","y":1957,"p":"https://image.tmdb.org/t/p/w500/zhG3vKWyDRaZYoaww1UVAi29T9h.jpg"},{"t":"To Kill a Mockingbird","y":1962,"p":"https://image.tmdb.org/t/p/w500/gZycFUMLx2110dzK3nBNai7gfpM.jpg"},{"t":"The Social Network","y":2010,"p":"https://image.tmdb.org/t/p/w500/n0ybibhJtQ5icDqTp8eRytcIHJx.jpg"},{"t":"Whiplash","y":2014,"p":"https://image.tmdb.org/t/p/w500/7fn624j5lj3xTme2SgiLCeuedmO.jpg"},{"t":"Birdman","y":2014,"p":"https://image.tmdb.org/t/p/w500/rHUg2AuIuLSIYMYFgavVwqt1jtc.jpg"},{"t":"Spotlight","y":2015,"p":"https://image.tmdb.org/t/p/w500/8DPGG400FgaFWaqcv11n8mRd2NG.jpg"},{"t":"The Revenant","y":2015,"p":"https://image.tmdb.org/t/p/w500/ji3ecJphATlVgWNY0B0RVXZizdf.jpg"},{"t":"Three Billboards Outside Ebbing, Missouri","y":2017,"p":"https://image.tmdb.org/t/p/w500/bRYLt8fV82tdVoDppSFTZIcJiLN.jpg"},{"t":"Marriage Story","y":2019,"p":"https://image.tmdb.org/t/p/w500/2JRyCKaRKyJAVpsIHeLvPw5nHmw.jpg"},{"t":"Nomadland","y":2020,"p":"https://image.tmdb.org/t/p/w500/8Vc5EOUEIF1EUXuX9eLFf7BvN3P.jpg"},{"t":"CODA","y":2021,"p":"https://image.tmdb.org/t/p/w500/BzVjmm8l23rPsijLiNLUzuQtyd.jpg"},{"t":"The Father","y":2020,"p":"https://image.tmdb.org/t/p/w500/pr3bEQ517uMb5loLvjFQi8uLAsp.jpg"},{"t":"Oppenheimer","y":2023,"p":"https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"},{"t":"The King's Speech","y":2010,"p":"https://image.tmdb.org/t/p/w500/pVNKXVQFukBaCz6ML7GH3kiPlQP.jpg"},{"t":"Slumdog Millionaire","y":2008,"p":"https://image.tmdb.org/t/p/w500/5leCCi7ZF0CawAfM5Qo2ECKPprc.jpg"},{"t":"Million Dollar Baby","y":2004,"p":"https://image.tmdb.org/t/p/w500/jcfEqKdWF1zeyvECPqp3mkWLct2.jpg"},{"t":"Gran Torino","y":2008,"p":"https://image.tmdb.org/t/p/w500/zUybYvxWdAJy5hhYovsXtHSWI1l.jpg"},{"t":"The Departed","y":2006,"p":"https://image.tmdb.org/t/p/w500/nT97ifVT2J1yMQmeq20Qblg61T.jpg"},{"t":"There Will Be Blood","y":2007,"p":"https://image.tmdb.org/t/p/w500/fa0RDkAlCec0STeMNAhPaF89q6U.jpg"},{"t":"No Country for Old Men","y":2007,"p":"https://image.tmdb.org/t/p/w500/uB7RDZby43Wvu8SKGHHTwGyTDBX.jpg"},{"t":"American Beauty","y":1999,"p":"https://image.tmdb.org/t/p/w500/wby9315QzVKdW9BonAefg8jGTTb.jpg"},{"t":"Requiem for a Dream","y":2000,"p":"https://image.tmdb.org/t/p/w500/9BTwsLaMVHOGFlmsSlx5QYCaXb.jpg"},{"t":"City of God","y":2002,"p":"https://image.tmdb.org/t/p/w500/k7eYdWvhYQyRQoU2TB2A2Xu2TfD.jpg"},{"t":"The Pianist","y":2002,"p":"https://image.tmdb.org/t/p/w500/2hFvxCCWrTmCYwfy7yum0GKRi3Y.jpg"},{"t":"Life Is Beautiful","y":1997,"p":"https://image.tmdb.org/t/p/w500/74hLDKjD5aGYOotO6esUVaeISa2.jpg"},{"t":"Cinema Paradiso","y":1988,"p":"https://image.tmdb.org/t/p/w500/gCI2AeMV4IHSewhJkzsur5MEp6R.jpg"},{"t":"Parasite","y":2019,"p":"https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg"},{"t":"Green Book","y":2018,"p":"https://image.tmdb.org/t/p/w500/7BsvSuDQuoqhWmU2fL7W2GOcZHU.jpg"},{"t":"Little Women","y":2019,"p":"https://image.tmdb.org/t/p/w500/yn5ihODtZ7ofn8pDYfxCmxh8AXI.jpg"},{"t":"The Help","y":2011,"p":"https://image.tmdb.org/t/p/w500/3kmfoWWEc9Vtyuaf9v5VipRgdjx.jpg"},{"t":"Argo","y":2012,"p":"https://image.tmdb.org/t/p/w500/m5gPWFZFIp4UJFABgWyLkbXv8GX.jpg"},{"t":"Boyhood","y":2014,"p":"https://image.tmdb.org/t/p/w500/2BvtvDUyxiMJ4dmKfiQf4qdOHQN.jpg"},{"t":"The Imitation Game","y":2014,"p":"https://image.tmdb.org/t/p/w500/zSqJ1qFq8NXFfi7JeIYMlzyR0dx.jpg"}],"scifi":[{"t":"2001: A Space Odyssey","y":1968,"p":"https://image.tmdb.org/t/p/w500/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg"},{"t":"Blade Runner","y":1982,"p":"https://image.tmdb.org/t/p/w500/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg"},{"t":"Blade Runner 2049","y":2017,"p":"https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg"},{"t":"Star Wars","y":1977,"p":"https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"},{"t":"The Empire Strikes Back","y":1980,"p":"https://image.tmdb.org/t/p/w500/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg"},{"t":"E.T. the Extra-Terrestrial","y":1982,"p":"https://image.tmdb.org/t/p/w500/an0nD6uq6byfxXCfk6lQBzdL2J1.jpg"},{"t":"Back to the Future","y":1985,"p":"https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg"},{"t":"Alien","y":1979,"p":"https://image.tmdb.org/t/p/w500/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg"},{"t":"The Terminator","y":1984,"p":"https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg"},{"t":"Jurassic Park","y":1993,"p":"https://image.tmdb.org/t/p/w500/b1xCNnyrPebIc7EWNZIa6jhb1Ww.jpg"},{"t":"The Matrix","y":1999,"p":"https://image.tmdb.org/t/p/w500/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg"},{"t":"Interstellar","y":2014,"p":"https://image.tmdb.org/t/p/w500/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg"},{"t":"Inception","y":2010,"p":"https://image.tmdb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg"},{"t":"Arrival","y":2016,"p":"https://image.tmdb.org/t/p/w500/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg"},{"t":"The Martian","y":2015,"p":"https://image.tmdb.org/t/p/w500/pjYWdykADVLTCh5g475RnI2hWIN.jpg"},{"t":"Gravity","y":2013,"p":"https://image.tmdb.org/t/p/w500/kZ2nZw8D681aphje8NJi8EfbL1U.jpg"},{"t":"Ex Machina","y":2014,"p":"https://image.tmdb.org/t/p/w500/dmJW8IAKHKxFNiUnoDR7JfsK7Rp.jpg"},{"t":"Dune","y":2021,"p":"https://image.tmdb.org/t/p/w500/gDzOcq0pfeCeqMBwKIJlSmQpjkZ.jpg"},{"t":"Dune: Part Two","y":2024,"p":"https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg"},{"t":"District 9","y":2009,"p":"https://image.tmdb.org/t/p/w500/tuGlQkqLxnodDSk6mp5c2wvxUEd.jpg"},{"t":"Minority Report","y":2002,"p":"https://image.tmdb.org/t/p/w500/ccqpHq5tk5W4ymbSbuoy4uYOxFI.jpg"},{"t":"I, Robot","y":2004,"p":"https://image.tmdb.org/t/p/w500/efwv6F2lGaghjPpBRSINHtoEiZB.jpg"},{"t":"War of the Worlds","y":2005,"p":"https://image.tmdb.org/t/p/w500/6Biy7R9LfumYshur3YKhpj56MpB.jpg"},{"t":"Independence Day","y":1996,"p":"https://image.tmdb.org/t/p/w500/p0BPQGSPoSa8Ml0DAf2mB2kCU0R.jpg"},{"t":"Men in Black","y":1997,"p":"https://image.tmdb.org/t/p/w500/uLOmOF5IzWoyrgIF5MfUnh5pa1X.jpg"},{"t":"The Fifth Element","y":1997,"p":"https://image.tmdb.org/t/p/w500/fPtlCO1yQtnoLHOwKtWz7db6RGU.jpg"},{"t":"Twelve Monkeys","y":1995,"p":"https://image.tmdb.org/t/p/w500/gt3iyguaCIw8DpQZI1LIN5TohM2.jpg"},{"t":"Donnie Darko","y":2001,"p":"https://image.tmdb.org/t/p/w500/j2AtZFsflxiluaNtajMTI0Avm8C.jpg"},{"t":"A Clockwork Orange","y":1971,"p":"https://image.tmdb.org/t/p/w500/4sHeTAp65WrSSuc05nRBKddhBxO.jpg"},{"t":"Close Encounters of the Third Kind","y":1977,"p":"https://image.tmdb.org/t/p/w500/yaPx3cK9zGFX3SbcKwxWM1QIbUh.jpg"},{"t":"Total Recall","y":1990,"p":"https://image.tmdb.org/t/p/w500/wVbeL6fkbTKSmNfalj4VoAUUqJv.jpg"},{"t":"Starship Troopers","y":1997,"p":"https://image.tmdb.org/t/p/w500/cxCmv23O7p3hyHwqoktHYkZcGsY.jpg"},{"t":"Gattaca","y":1997,"p":"https://image.tmdb.org/t/p/w500/eSKr5Fl1MEC7zpAXaLWBWSBjgJq.jpg"},{"t":"Contact","y":1997,"p":"https://image.tmdb.org/t/p/w500/bCpMIywuNZeWt3i5UMLEIc0VSwM.jpg"},{"t":"Snowpiercer","y":2013,"p":"https://image.tmdb.org/t/p/w500/kw6YQudA0TMcNmGUGy5XIw7zbnV.jpg"},{"t":"Looper","y":2012,"p":"https://image.tmdb.org/t/p/w500/sNjL6SqErDBE8OUZlrDLkexfsCj.jpg"},{"t":"Source Code","y":2011,"p":"https://image.tmdb.org/t/p/w500/nTr0lvAzeQmUjgSgDEHTJpnrxTz.jpg"},{"t":"Oblivion","y":2013,"p":"https://image.tmdb.org/t/p/w500/bYLM3GpNUZnoFElPXp1zlhDPdtv.jpg"},{"t":"Pacific Rim","y":2013,"p":"https://image.tmdb.org/t/p/w500/8wo4eN8dWKaKlxhSvBz19uvj8gA.jpg"},{"t":"Ready Player One","y":2018,"p":"https://image.tmdb.org/t/p/w500/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg"},{"t":"Tenet","y":2020,"p":"https://image.tmdb.org/t/p/w500/aCIFMriQh8rvhxpN1IWGgvH0Tlg.jpg"},{"t":"Everything Everywhere All at Once","y":2022,"p":"https://image.tmdb.org/t/p/w500/u68AjlvlutfEIcpmbYpKcdi09ut.jpg"},{"t":"Avatar","y":2009,"p":"https://image.tmdb.org/t/p/w500/gKY6q7SjCkAU6FqvqWybDYgUKIF.jpg"},{"t":"Star Trek","y":2009,"p":"https://image.tmdb.org/t/p/w500/9vaRPXj44Q2meHgt3VVfQufiHOJ.jpg"},{"t":"The Day After Tomorrow","y":2004,"p":"https://image.tmdb.org/t/p/w500/Wr4HeYQRvwVCxzOV5TmGE7UkXq.jpg"},{"t":"I Am Legend","y":2007,"p":"https://image.tmdb.org/t/p/w500/iPDkaSdKk2jRLTM65UOEoKtsIZ8.jpg"},{"t":"Elysium","y":2013,"p":"https://image.tmdb.org/t/p/w500/aRjuJuPXHtVs6YegfeeQWXGRs1E.jpg"},{"t":"Return of the Jedi","y":1983,"p":"https://image.tmdb.org/t/p/w500/jQYlydvHm3kUix1f8prMucrplhm.jpg"}],"horror":[{"t":"The Exorcist","y":1973,"p":"https://image.tmdb.org/t/p/w500/5x0CeVHJI8tcDx8tUUwYHQSNILq.jpg"},{"t":"The Shining","y":1980,"p":"https://image.tmdb.org/t/p/w500/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg"},{"t":"Halloween","y":1978,"p":"https://image.tmdb.org/t/p/w500/wijlZ3HaYMvlDTPqJoTCWKFkCPU.jpg"},{"t":"A Nightmare on Elm Street","y":1984,"p":"https://image.tmdb.org/t/p/w500/b9rMHAAKISRmIonaQd9Cccx0S4X.jpg"},{"t":"Friday the 13th","y":1980,"p":"https://image.tmdb.org/t/p/w500/uGGpnWHOmWTARVN9wbC1nPxNgps.jpg"},{"t":"Scream","y":1996,"p":"https://image.tmdb.org/t/p/w500/lr9ZIrmuwVmZhpZuTCW8D9g0ZJe.jpg"},{"t":"The Texas Chain Saw Massacre","y":1974,"p":"https://image.tmdb.org/t/p/w500/mpgkRPH1GNkMCgdPk2OMyHzAks7.jpg"},{"t":"Psycho","y":1960,"p":"https://image.tmdb.org/t/p/w500/yz4QVqPx3h1hD1DfqqQkCq3rmxW.jpg"},{"t":"Jaws","y":1975,"p":"https://image.tmdb.org/t/p/w500/lxM6kqilAdpdhqUl2biYp5frUxE.jpg"},{"t":"The Silence of the Lambs","y":1991,"p":"https://image.tmdb.org/t/p/w500/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg"},{"t":"It","y":2017,"p":"https://image.tmdb.org/t/p/w500/9E2y5Q7WlCVNEhP5GiVTjhEhx1o.jpg"},{"t":"The Conjuring","y":2013,"p":"https://image.tmdb.org/t/p/w500/wVYREutTvI2tmxr6ujrHT704wGF.jpg"},{"t":"Insidious","y":2010,"p":"https://image.tmdb.org/t/p/w500/1egpmVXuXed58TH2UOnX1nATTrf.jpg"},{"t":"Hereditary","y":2018,"p":"https://image.tmdb.org/t/p/w500/4GFPuL14eXi66V96xBWY73Y9PfR.jpg"},{"t":"Midsommar","y":2019,"p":"https://image.tmdb.org/t/p/w500/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"},{"t":"Get Out","y":2017,"p":"https://image.tmdb.org/t/p/w500/tFXcEccSQMf3lfhfXKSU9iRBpa3.jpg"},{"t":"Us","y":2019,"p":"https://image.tmdb.org/t/p/w500/ux2dU1jQ2ACIMShzB3yP93Udpzc.jpg"},{"t":"A Quiet Place","y":2018,"p":"https://image.tmdb.org/t/p/w500/nAU74GmpUk7t5iklEp3bufwDq4n.jpg"},{"t":"The Babadook","y":2014,"p":"https://image.tmdb.org/t/p/w500/qt3fqapeo94TfvMyld8P7gkpXLz.jpg"},{"t":"It Follows","y":2014,"p":"https://image.tmdb.org/t/p/w500/iwnQ1JH1wdWrGYkgWySptJ5284A.jpg"},{"t":"The Witch","y":2015,"p":"https://image.tmdb.org/t/p/w500/zap5hpFCWSvdWSuPGAQyjUv2wAC.jpg"},{"t":"Sinister","y":2012,"p":"https://image.tmdb.org/t/p/w500/nzx10sca3arCeYBAomHan4Q6wa1.jpg"},{"t":"Paranormal Activity","y":2007,"p":"https://image.tmdb.org/t/p/w500/tmclkEpjeo4Zu564gf3KrwIOuKw.jpg"},{"t":"The Blair Witch Project","y":1999,"p":"https://image.tmdb.org/t/p/w500/9050VGrYjYrEjpOvDZVAngLbg1f.jpg"},{"t":"Saw","y":2004,"p":"https://image.tmdb.org/t/p/w500/rLNSOudrayDBo1uqXjrhxcjODIC.jpg"},{"t":"28 Days Later","y":2002,"p":"https://image.tmdb.org/t/p/w500/sQckQRt17VaWbo39GIu0TMOiszq.jpg"},{"t":"Dawn of the Dead","y":1978,"p":"https://image.tmdb.org/t/p/w500/70MY8H0bLMvXf8ED2SgVMPhDVVM.jpg"},{"t":"Night of the Living Dead","y":1968,"p":"https://image.tmdb.org/t/p/w500/rb2NWyb008u1EcKCOyXs2Nmj0ra.jpg"},{"t":"Evil Dead II","y":1987,"p":"https://image.tmdb.org/t/p/w500/4zqCKJVHUolGs6C5AZwAZqLWixW.jpg"},{"t":"Poltergeist","y":1982,"p":"https://image.tmdb.org/t/p/w500/4eMN3GANH5GG4kXdHkrTZEUuQ9M.jpg"},{"t":"Carrie","y":1976,"p":"https://image.tmdb.org/t/p/w500/8tT1rqlsTguyfUBMrbHR9cv1rxM.jpg"},{"t":"Rosemary's Baby","y":1968,"p":"https://image.tmdb.org/t/p/w500/uYgvlHceRFjAFbsNeMInYcLZLUb.jpg"},{"t":"The Omen","y":1976,"p":"https://image.tmdb.org/t/p/w500/mDcjjEu1fMNmsXi4l4D8IftlTix.jpg"},{"t":"The Thing","y":1982,"p":"https://image.tmdb.org/t/p/w500/ob1NaOSYDC4iBaFkTgIUecaMFGT.jpg"},{"t":"The Ring","y":2002,"p":"https://image.tmdb.org/t/p/w500/AeRpUynJKDpJveklBJipOYrVxCS.jpg"},{"t":"The Grudge","y":2004,"p":"https://image.tmdb.org/t/p/w500/7vPAVPKYexQVmvC578wPLn2CGCL.jpg"},{"t":"The Others","y":2001,"p":"https://image.tmdb.org/t/p/w500/p8g1vlTvpM6nr2hMMiZ1fUlKF0D.jpg"},{"t":"Train to Busan","y":2016,"p":"https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg"},{"t":"Let the Right One In","y":2008,"p":"https://image.tmdb.org/t/p/w500/7IG4WjaAOVDlLvLUkh513HSwhW8.jpg"},{"t":"The Descent","y":2005,"p":"https://image.tmdb.org/t/p/w500/mxFPI4KYBk5ri9cPteIS8jiDFgj.jpg"},{"t":"Annabelle","y":2014,"p":"https://image.tmdb.org/t/p/w500/yLsuU2P2SpDYFwtZQ7dtfVAf6TE.jpg"},{"t":"The Nun","y":2018,"p":"https://image.tmdb.org/t/p/w500/sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg"},{"t":"Smile","y":2022,"p":"https://image.tmdb.org/t/p/w500/aPqcQwu4VGEewPhagWNncDbJ9Xp.jpg"},{"t":"M3GAN","y":2022,"p":"https://image.tmdb.org/t/p/w500/d9nBoowhjiiYc4FBNtQkPY7c11H.jpg"},{"t":"Nope","y":2022,"p":"https://image.tmdb.org/t/p/w500/AcKVlWaNVVVFQwro3nLXqPljcYA.jpg"},{"t":"Talk to Me","y":2022,"p":"https://image.tmdb.org/t/p/w500/kdPMUMJzyYAc4roD52qavX0nLIC.jpg"},{"t":"The Sixth Sense","y":1999,"p":"https://image.tmdb.org/t/p/w500/vOyfUXNFSnaTk7Vk5AjpsKTUWsu.jpg"},{"t":"World War Z","y":2013,"p":"https://image.tmdb.org/t/p/w500/aCnVdvExw6UWSeQfr0tUH3jr4qG.jpg"}],"romance":[{"t":"Titanic","y":1997,"p":"https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg"},{"t":"The Notebook","y":2004,"p":"https://image.tmdb.org/t/p/w500/rNzQyW4f8B8cQeg7Dgj3n6eT5k9.jpg"},{"t":"Pride & Prejudice","y":2005,"p":"https://image.tmdb.org/t/p/w500/o8UhmEbWPHmTUxP0lMuCoqNkbB3.jpg"},{"t":"La La Land","y":2016,"p":"https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg"},{"t":"Before Sunrise","y":1995,"p":"https://image.tmdb.org/t/p/w500/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg"},{"t":"Before Sunset","y":2004,"p":"https://image.tmdb.org/t/p/w500/4sW5XH9ZfYXpvFzev00S1IGAEbg.jpg"},{"t":"Casablanca","y":1942,"p":"https://image.tmdb.org/t/p/w500/lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg"},{"t":"Gone with the Wind","y":1939,"p":"https://image.tmdb.org/t/p/w500/lNz2Ow0wGCAvzckW7EOjE03KcYv.jpg"},{"t":"Roman Holiday","y":1953,"p":"https://image.tmdb.org/t/p/w500/8lI9dmz1RH20FAqltkGelY1v4BE.jpg"},{"t":"Breakfast at Tiffany's","y":1961,"p":"https://image.tmdb.org/t/p/w500/79xm4gXw4l7A5D0XukUOJRocFYQ.jpg"},{"t":"Dirty Dancing","y":1987,"p":"https://image.tmdb.org/t/p/w500/9Jw6jys7q9gjzVX5zm1z0gC8gY9.jpg"},{"t":"Ghost","y":1990,"p":"https://image.tmdb.org/t/p/w500/w9RaPHov8oM5cnzeE27isnFMsvS.jpg"},{"t":"Pretty Woman","y":1990,"p":"https://image.tmdb.org/t/p/w500/hVHUfT801LQATGd26VPzhorIYza.jpg"},{"t":"Sleepless in Seattle","y":1993,"p":"https://image.tmdb.org/t/p/w500/jAXfku1u1uaLGh4cUmK0ESf1pPu.jpg"},{"t":"You've Got Mail","y":1998,"p":"https://image.tmdb.org/t/p/w500/e2uVtH6TpMfUl7WeOM70ezkcjsU.jpg"},{"t":"Notting Hill","y":1999,"p":"https://image.tmdb.org/t/p/w500/hHRIf2XHeQMbyRb3HUx19SF5Ujw.jpg"},{"t":"10 Things I Hate About You","y":1999,"p":"https://image.tmdb.org/t/p/w500/ujERk3aKABXU3NDXOAxEQYTHe9A.jpg"},{"t":"Love Actually","y":2003,"p":"https://image.tmdb.org/t/p/w500/7QPeVsr9rcFU9Gl90yg0gTOTpVv.jpg"},{"t":"50 First Dates","y":2004,"p":"https://image.tmdb.org/t/p/w500/lzUI2Cg7OMfcUNv3f7MywYNBjs6.jpg"},{"t":"Eternal Sunshine of the Spotless Mind","y":2004,"p":"https://image.tmdb.org/t/p/w500/5MwkWH9tYHv3mV9OdYTMR5qreIz.jpg"},{"t":"The Holiday","y":2006,"p":"https://image.tmdb.org/t/p/w500/h1ITOpvJN3Tw4Sy60w2QTfYMvdd.jpg"},{"t":"Twilight","y":2008,"p":"https://image.tmdb.org/t/p/w500/3Gkb6jm6962ADUPaCBqzz9CTbn9.jpg"},{"t":"(500) Days of Summer","y":2009,"p":"https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg"},{"t":"Crazy, Stupid, Love.","y":2011,"p":"https://image.tmdb.org/t/p/w500/p4RafgAPk558muOjnBMHhMArjS2.jpg"},{"t":"Silver Linings Playbook","y":2012,"p":"https://image.tmdb.org/t/p/w500/fhHB1uvfFKKFbj6bTKE8xdtsjKi.jpg"},{"t":"The Fault in Our Stars","y":2014,"p":"https://image.tmdb.org/t/p/w500/kcVuktIlrn9SAN1uBmPDnocTQmF.jpg"},{"t":"Me Before You","y":2016,"p":"https://image.tmdb.org/t/p/w500/Ia3dzj5LnCj1ZBdlVeJrbKJQxG.jpg"},{"t":"Call Me by Your Name","y":2017,"p":"https://image.tmdb.org/t/p/w500/mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg"},{"t":"The Shape of Water","y":2017,"p":"https://image.tmdb.org/t/p/w500/9zfwPffUXpBrEP26yp0q1ckXDcj.jpg"},{"t":"A Star Is Born","y":2018,"p":"https://image.tmdb.org/t/p/w500/wrFpXMNBRj2PBiN4Z5kix51XaIZ.jpg"},{"t":"Crazy Rich Asians","y":2018,"p":"https://image.tmdb.org/t/p/w500/1XxL4LJ5WHdrcYcihEZUCgNCpAW.jpg"},{"t":"To All the Boys I've Loved Before","y":2018,"p":"https://image.tmdb.org/t/p/w500/hKHZhUbIyUAjcSrqJThFGYIR6kI.jpg"},{"t":"About Time","y":2013,"p":"https://image.tmdb.org/t/p/w500/ls6zswrOZVhCXQBh96DlbnLBajM.jpg"},{"t":"Her","y":2013,"p":"https://image.tmdb.org/t/p/w500/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg"},{"t":"The Princess Bride","y":1987,"p":"https://image.tmdb.org/t/p/w500/2FC9L9MrjBoGHYjYZjdWQdopVYb.jpg"},{"t":"When Harry Met Sally...","y":1989,"p":"https://image.tmdb.org/t/p/w500/rFOiFUhTMtDetqCGClC9PIgnC1P.jpg"},{"t":"Four Weddings and a Funeral","y":1994,"p":"https://image.tmdb.org/t/p/w500/qa72G2VS0bpxms6yo0tI9vsHm2e.jpg"},{"t":"Jerry Maguire","y":1996,"p":"https://image.tmdb.org/t/p/w500/lABvGN7fDk5ifnwZoxij6G96t2w.jpg"},{"t":"Shakespeare in Love","y":1998,"p":"https://image.tmdb.org/t/p/w500/zdW7jdzPi4J9KZR3TyY2jn3Xh5e.jpg"},{"t":"Serendipity","y":2001,"p":"https://image.tmdb.org/t/p/w500/4jS66Qmq2Ru5S2YzHVknGd4xJyT.jpg"},{"t":"A Walk to Remember","y":2002,"p":"https://image.tmdb.org/t/p/w500/8lUYMvWdHA0Q0k5F76RQCeCBUkA.jpg"},{"t":"Brokeback Mountain","y":2005,"p":"https://image.tmdb.org/t/p/w500/aByfQOQBNa4CMFwIgq3QrqY2ZHh.jpg"},{"t":"Atonement","y":2007,"p":"https://image.tmdb.org/t/p/w500/hMRIyBjPzxaSXWM06se3OcNjIQa.jpg"},{"t":"One Day","y":2011,"p":"https://image.tmdb.org/t/p/w500/n9jMwSg4IavdD8wqdYnyW5w3Mvp.jpg"},{"t":"Carol","y":2015,"p":"https://image.tmdb.org/t/p/w500/cJeled7EyPdur6TnCA5GYg0UVna.jpg"},{"t":"Past Lives","y":2023,"p":"https://image.tmdb.org/t/p/w500/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg"},{"t":"Anyone but You","y":2023,"p":"https://image.tmdb.org/t/p/w500/5qHoazZiaLe7oFBok7XlUhg96f2.jpg"},{"t":"The Vow","y":2012,"p":"https://image.tmdb.org/t/p/w500/y5GUXzTvt7kSQbdQrSvbYNoa8HB.jpg"}],"documentary":[{"t":"Free Solo","y":2018,"p":"https://image.tmdb.org/t/p/w500/v4QfYZMACODlWul9doN9RxE99ag.jpg"},{"t":"March of the Penguins","y":2005,"p":"https://image.tmdb.org/t/p/w500/o9xJ1xG1WKlHkl8ACqq0LShOuMu.jpg"},{"t":"An Inconvenient Truth","y":2006,"p":"https://image.tmdb.org/t/p/w500/zrYT5UHE2UIsofwkv6KK2Tsu5a.jpg"},{"t":"Bowling for Columbine","y":2002,"p":"https://image.tmdb.org/t/p/w500/4XsiTsZcNCRSkee1o0fdr5OqYRT.jpg"},{"t":"Fahrenheit 9/11","y":2004,"p":"https://image.tmdb.org/t/p/w500/cZ7M343iuiMDc36fSeSm699XQFv.jpg"},{"t":"Super Size Me","y":2004,"p":"https://image.tmdb.org/t/p/w500/zYkbqQaCuIHBxqBDGgnQCwJ9jIG.jpg"},{"t":"Blackfish","y":2013,"p":"https://image.tmdb.org/t/p/w500/kCk4mDFE96Mn1AYfEcbxkIiw7ND.jpg"},{"t":"The Cove","y":2009,"p":"https://image.tmdb.org/t/p/w500/miodcVtQv2YxpKjjHJWcV0EDfSP.jpg"},{"t":"Food, Inc.","y":2008,"p":"https://image.tmdb.org/t/p/w500/zdwN4o7OGAZGJw9T64lRAGTEP8b.jpg"},{"t":"Man on Wire","y":2008,"p":"https://image.tmdb.org/t/p/w500/1mS4rhIgHZcHIvf1beP9Av0Ui33.jpg"},{"t":"Searching for Sugar Man","y":2012,"p":"https://image.tmdb.org/t/p/w500/ucM98HuBHSWmn44oiE83hIDc6VB.jpg"},{"t":"20 Feet from Stardom","y":2013,"p":"https://image.tmdb.org/t/p/w500/6iRxKxfE6SB586cQV3BH8NSMzoZ.jpg"},{"t":"Amy","y":2015,"p":"https://image.tmdb.org/t/p/w500/qBUM1eatfS6ldhdGlDw8K5yi5hX.jpg"},{"t":"Citizenfour","y":2014,"p":"https://image.tmdb.org/t/p/w500/nOVhX69EAxtSKEEnr5UcSd5UVci.jpg"},{"t":"13th","y":2016,"p":"https://image.tmdb.org/t/p/w500/tcKNWD6IFPPsvkpvyZ548naz0is.jpg"},{"t":"O.J.: Made in America","y":2016,"p":"https://image.tmdb.org/t/p/w500/nFmg2G4IJ0x9mALXkYFN8Gw0Dw5.jpg"},{"t":"Icarus","y":2017,"p":"https://image.tmdb.org/t/p/w500/x5azMi1KvZWbBbfjmGqpHNGqjH.jpg"},{"t":"Jane","y":2017,"p":"https://image.tmdb.org/t/p/w500/lasO6v47evkx4JfRqf4Rhqp8FZd.jpg"},{"t":"Won't You Be My Neighbor?","y":2018,"p":"https://image.tmdb.org/t/p/w500/8qE8NZjiP2M884baH0VoLF828Vp.jpg"},{"t":"Three Identical Strangers","y":2018,"p":"https://image.tmdb.org/t/p/w500/esPoJNMBsgWXahv8gILIl5K6sFk.jpg"},{"t":"RBG","y":2018,"p":"https://image.tmdb.org/t/p/w500/vIenhDe9DuvxODJOIpMjBheYlcS.jpg"},{"t":"Apollo 11","y":2019,"p":"https://image.tmdb.org/t/p/w500/woLMRroHyoTGoXyxdEeBJEYBFtu.jpg"},{"t":"Honeyland","y":2019,"p":"https://image.tmdb.org/t/p/w500/3IxGhQEzLWOxkZlcNMAIiYlOT8D.jpg"},{"t":"American Factory","y":2019,"p":"https://image.tmdb.org/t/p/w500/7jH3dQOJ3CHMrp9tWsI3rRCDiaD.jpg"},{"t":"For Sama","y":2019,"p":"https://image.tmdb.org/t/p/w500/mDna51F8QfrJFZOgPGQUz3VKqsB.jpg"},{"t":"My Octopus Teacher","y":2020,"p":"https://image.tmdb.org/t/p/w500/hvTVZb7hBC8tZAGoEhH5eiMJu2B.jpg"},{"t":"The Social Dilemma","y":2020,"p":"https://image.tmdb.org/t/p/w500/jcaM6V2tCtu6iMHDsGLBUbaYgYp.jpg"},{"t":"Summer of Soul","y":2021,"p":"https://image.tmdb.org/t/p/w500/8kNwhqUGvpzWJd60O1Qvb8G6psK.jpg"},{"t":"Flee","y":2021,"p":"https://image.tmdb.org/t/p/w500/vlMIbqOpYG553J1kOJXA7mwQvE6.jpg"},{"t":"The Rescue","y":2021,"p":"https://image.tmdb.org/t/p/w500/kC7fVtCkJACwPBaRr2hlj2whfKX.jpg"},{"t":"Fire of Love","y":2022,"p":"https://image.tmdb.org/t/p/w500/9smEX8UP84yb2GisLwyAyQKvCWS.jpg"},{"t":"Navalny","y":2022,"p":"https://image.tmdb.org/t/p/w500/9FXHNsqB4Wk9p42Yh0UtDflRY1f.jpg"},{"t":"All the Beauty and the Bloodshed","y":2022,"p":"https://image.tmdb.org/t/p/w500/cvO51xxtIUHc5w5ZgFsigiFaUaO.jpg"},{"t":"20 Days in Mariupol","y":2023,"p":"https://image.tmdb.org/t/p/w500/zIRp1IeuPh4GgqFCH3y0DQuY9xP.jpg"},{"t":"Still: A Michael J. Fox Movie","y":2023,"p":"https://image.tmdb.org/t/p/w500/fDO4gYZxvdsIrHKzsSAbc3N7Wfg.jpg"},{"t":"The Deepest Breath","y":2023,"p":"https://image.tmdb.org/t/p/w500/4gKAn4npGEBi0HZAbwFZ77reLBR.jpg"},{"t":"Grizzly Man","y":2005,"p":"https://image.tmdb.org/t/p/w500/zuZWpcuye25rpsiZ4XzsAvmLDHG.jpg"},{"t":"Jiro Dreams of Sushi","y":2011,"p":"https://image.tmdb.org/t/p/w500/iVrkM4jSJw1IsOpW5jTtY5QxVqj.jpg"},{"t":"Exit Through the Gift Shop","y":2010,"p":"https://image.tmdb.org/t/p/w500/ruM5ehUQlHC1Kx3SF18d6klfrAx.jpg"},{"t":"Senna","y":2010,"p":"https://image.tmdb.org/t/p/w500/nZbLCbRoP6iJq5sr8daHQzjnzFh.jpg"},{"t":"The Act of Killing","y":2012,"p":"https://image.tmdb.org/t/p/w500/sp5B7Tz5ttsgOLnIlCP5uEhtesI.jpg"},{"t":"Stories We Tell","y":2012,"p":"https://image.tmdb.org/t/p/w500/aVDtDW3qP0je1Cy87GDfijG9W4c.jpg"},{"t":"Finding Vivian Maier","y":2013,"p":"https://image.tmdb.org/t/p/w500/yaj9mpHNpns5j4ODP4352PgDWJM.jpg"},{"t":"Virunga","y":2014,"p":"https://image.tmdb.org/t/p/w500/7ULqkiqpxWfQxNHRq5PeZjJQ3f6.jpg"},{"t":"He Named Me Malala","y":2015,"p":"https://image.tmdb.org/t/p/w500/lOYrqRKhOrPd5RvWoyTw71KVI6z.jpg"},{"t":"Hoop Dreams","y":1994,"p":"https://image.tmdb.org/t/p/w500/gLzHl2XBtVwycl8DxdOXRHPm8G3.jpg"},{"t":"Grey Gardens","y":1975,"p":"https://image.tmdb.org/t/p/w500/qFPj6Eh3ijA4ISRujHu4GKKeAWT.jpg"},{"t":"Woodstock","y":1970,"p":"https://image.tmdb.org/t/p/w500/cnfhelfQucSb4Y54yFgtnSNhsAT.jpg"}],"animation":[{"t":"The Lion King","y":1994,"p":"https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg"},{"t":"Toy Story","y":1995,"p":"https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg"},{"t":"Toy Story 3","y":2010,"p":"https://image.tmdb.org/t/p/w500/AbbXspMOwdvwWZgVN0nabZq03Ec.jpg"},{"t":"Finding Nemo","y":2003,"p":"https://image.tmdb.org/t/p/w500/5lc6nQc0VhWFYFbNv016xze8Jvy.jpg"},{"t":"Up","y":2009,"p":"https://image.tmdb.org/t/p/w500/mFvoEwSfLqbcWwFsDjQebn9bzFe.jpg"},{"t":"WALL·E","y":2008,"p":"https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg"},{"t":"Inside Out","y":2015,"p":"https://image.tmdb.org/t/p/w500/2H1TmgdfNtsKlU9jKdeNyYL5y8T.jpg"},{"t":"Coco","y":2017,"p":"https://image.tmdb.org/t/p/w500/6Ryitt95xrO8KXuqRGm1fUuNwqF.jpg"},{"t":"Ratatouille","y":2007,"p":"https://image.tmdb.org/t/p/w500/t3vaWRPSf6WjDSamIkKDs1iQWna.jpg"},{"t":"Monsters, Inc.","y":2001,"p":"https://image.tmdb.org/t/p/w500/wFSpyMsp7H0ttERbxY7Trlv8xry.jpg"},{"t":"The Incredibles","y":2004,"p":"https://image.tmdb.org/t/p/w500/2LqaLgk4Z226KkgPJuiOQ58wvrm.jpg"},{"t":"Shrek","y":2001,"p":"https://image.tmdb.org/t/p/w500/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg"},{"t":"Shrek 2","y":2004,"p":"https://image.tmdb.org/t/p/w500/2yYP0PQjG8zVqturh1BAqu2Tixl.jpg"},{"t":"Kung Fu Panda","y":2008,"p":"https://image.tmdb.org/t/p/w500/wWt4JYXTg5Wr3xBW2phBrMKgp3x.jpg"},{"t":"How to Train Your Dragon","y":2010,"p":"https://image.tmdb.org/t/p/w500/ygGmAO60t8GyqUo9xYeYxSZAR3b.jpg"},{"t":"Madagascar","y":2005,"p":"https://image.tmdb.org/t/p/w500/zMpJY5CJKUufG9OTw0In4eAFqPX.jpg"},{"t":"Ice Age","y":2002,"p":"https://image.tmdb.org/t/p/w500/gLhHHZUzeseRXShoDyC4VqLgsNv.jpg"},{"t":"Despicable Me","y":2010,"p":"https://image.tmdb.org/t/p/w500/b1BT309QWjtFUlJPLmXmrcHOWEL.jpg"},{"t":"Frozen","y":2013,"p":"https://image.tmdb.org/t/p/w500/itAKcobTYGpYT8Phwjd8c9hleTo.jpg"},{"t":"Moana","y":2016,"p":"https://image.tmdb.org/t/p/w500/m5MDZOIFEFlxGiLuAzWzFSsWcye.jpg"},{"t":"Tangled","y":2010,"p":"https://image.tmdb.org/t/p/w500/ym7Kst6a4uodryxqbGOxmewF235.jpg"},{"t":"Zootopia","y":2016,"p":"https://image.tmdb.org/t/p/w500/hlK0e0wAQ3VLuJcsfIYPvb4JVud.jpg"},{"t":"Big Hero 6","y":2014,"p":"https://image.tmdb.org/t/p/w500/2mxS4wUimwlLmI1xp6QW6NSU361.jpg"},{"t":"Wreck-It Ralph","y":2012,"p":"https://image.tmdb.org/t/p/w500/ihfvxPh5C4rV2WSKWs7k7rzxzzO.jpg"},{"t":"Encanto","y":2021,"p":"https://image.tmdb.org/t/p/w500/4j0PNHkMr5ax3IA8tjtxcmPU3QT.jpg"},{"t":"Turning Red","y":2022,"p":"https://image.tmdb.org/t/p/w500/qsdjk9oAKSQMWs0Vt5Pyfh6O4GZ.jpg"},{"t":"Luca","y":2021,"p":"https://image.tmdb.org/t/p/w500/9x4i9uKGXt8IiiIF5Ey0DIoY738.jpg"},{"t":"Soul","y":2020,"p":"https://image.tmdb.org/t/p/w500/6jmppcaubzLF8wkXM36ganVISCo.jpg"},{"t":"Spirited Away","y":2001,"p":"https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg"},{"t":"My Neighbor Totoro","y":1988,"p":"https://image.tmdb.org/t/p/w500/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg"},{"t":"Howl's Moving Castle","y":2004,"p":"https://image.tmdb.org/t/p/w500/13kOl2v0nD2OLbVSHnHk8GUFEhO.jpg"},{"t":"Princess Mononoke","y":1997,"p":"https://image.tmdb.org/t/p/w500/cMYCDADoLKLbB83g4WnJegaZimC.jpg"},{"t":"Kiki's Delivery Service","y":1989,"p":"https://image.tmdb.org/t/p/w500/Aufa4YdZIv4AXpR9rznwVA5SEfd.jpg"},{"t":"Grave of the Fireflies","y":1988,"p":"https://image.tmdb.org/t/p/w500/k9tv1rXZbOhH7eiCk378x61kNQ1.jpg"},{"t":"Your Name.","y":2016,"p":"https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg"},{"t":"Weathering with You","y":2019,"p":"https://image.tmdb.org/t/p/w500/qgrk7r1fV4IjuoeiGS5HOhXNdLJ.jpg"},{"t":"Suzume","y":2022,"p":"https://image.tmdb.org/t/p/w500/yStW1TXF5s7Tbtu9KjIZEaWl6HL.jpg"},{"t":"A Silent Voice","y":2016,"p":"https://image.tmdb.org/t/p/w500/tuFaWiqX0TXoWu7DGNcmX3UW7sT.jpg"},{"t":"Spider-Man: Into the Spider-Verse","y":2018,"p":"https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg"},{"t":"Spider-Man: Across the Spider-Verse","y":2023,"p":"https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg"},{"t":"The Nightmare Before Christmas","y":1993,"p":"https://image.tmdb.org/t/p/w500/oQffRNjK8e19rF7xVYEN8ew0j7b.jpg"},{"t":"Coraline","y":2009,"p":"https://image.tmdb.org/t/p/w500/4jeFXQYytChdZYE9JYO7Un87IlW.jpg"},{"t":"Wallace & Gromit: The Curse of the Were-Rabbit","y":2005,"p":"https://image.tmdb.org/t/p/w500/cMQ2lNd7sBe6PCf6zF5QxrKzbRG.jpg"},{"t":"Chicken Run","y":2000,"p":"https://image.tmdb.org/t/p/w500/8XgmIsbpVamdhwcNVsYzohFZTtT.jpg"},{"t":"The Iron Giant","y":1999,"p":"https://image.tmdb.org/t/p/w500/ct04FCFLPImNG5thcPLRnVsZlmS.jpg"},{"t":"Klaus","y":2019,"p":"https://image.tmdb.org/t/p/w500/q125RHUDgR4gjwh1QkfYuJLYkL.jpg"},{"t":"Puss in Boots: The Last Wish","y":2022,"p":"https://image.tmdb.org/t/p/w500/kuf6dutpsT0vSVehic3EZIqkOBt.jpg"},{"t":"Ne Zha","y":2019,"p":"https://image.tmdb.org/t/p/w500/phM9bb6s9c60LA8qwsdk7U1N2cS.jpg"}]};
+
+const CATEGORIES = [
+  {key:"action",      name:"Action",      roman:"I",    desc:"Things explode. People run. The Committee applauds from a safe distance."},
+  {key:"comedy",      name:"Comedy",      roman:"II",   desc:"Films that are funny on purpose — rarer than one might hope."},
+  {key:"drama",       name:"Drama",       roman:"III",  desc:"Real feelings, expensively lit."},
+  {key:"scifi",       name:"Sci-Fi",      roman:"IV",   desc:"Space, time, and other budgetary concerns."},
+  {key:"horror",      name:"Horror",      roman:"V",    desc:"The Committee watched these through its fingers. For science."},
+  {key:"romance",     name:"Romance",     roman:"VI",   desc:"Love, longing, and someone running through an airport."},
+  {key:"documentary", name:"Documentary", roman:"VII",  desc:"Entirely true, give or take an edit."},
+  {key:"animation",   name:"Animation",   roman:"VIII", desc:"Drawings that made grown adults cry. Repeatedly."}
+];
+
+const ROUND_META = {
+  32:{title:"ROUND OF 32", inter:"Thirty-two remain. The paperwork alone is staggering."},
+  16:{title:"ROUND OF 16", inter:"Sixteen remain. The Committee is quietly devastated for the others."},
+  8:{title:"THE QUARTERFINALS", inter:"Eight remain. It has become personal, though no one will admit it."},
+  4:{title:"THE SEMIFINALS", inter:"Four remain. The Committee has begun drafting apologies."},
+  2:{title:"THE GRAND FINAL", inter:"Two remain. History — or something quite like it — awaits."}
+};
+const ROUND_SHORT = {32:"Round of 32",16:"Round of 16",8:"Quarterfinal",4:"Semifinal",2:"Grand Final"};
+
+const SPEECHES = [
+  t=>`“${t}” would like to thank the Committee — all one of them — for this entirely objective decision.`,
+  t=>`In a stunning upset that surprised no one involved, “${t}” takes the Diamond.`,
+  t=>`“${t}” was reportedly “humbled”, which we are assured is customary.`,
+  t=>`The other forty-seven films have been sent our warmest condolences, by second-class post.`,
+  t=>`“${t}” wins. The Academy could not be reached for comment, which is probably for the best.`
+];
+
+/* ══════════════════ STATE ══════════════════ */
+let S = null;
+function newState(catKey){
+  const cat = CATEGORIES.find(c=>c.key===catKey);
+  const films = shuffle(FILMS[catKey].map((f,i)=>({id:i,t:f.t,y:f.y,p:f.p})));
+  const groups=[];
+  for(let g=0;g<12;g++) groups.push(films.slice(g*4,g*4+4));
+  return {
+    cat, films, groups,
+    phase:"groups", groupIdx:0, groupPicks:new Set(),
+    advanced:[], eliminated:[],
+    redPicks:new Set(),
+    bracket:[], matchIdx:0, roundSize:32, nextRound:[],
+    beaten:new Map(), // filmId -> [{round, opp}]
+    champion:null,
+    recapAssets:null
+  };
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const ROMANS=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI"];
+
+/* ══════════════════ HELPERS ══════════════════ */
+const $=id=>document.getElementById(id);
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  const el=$(id); el.style.animation="none"; void el.offsetWidth; el.style.animation="";
+  el.classList.add("active");
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),2600);
+}
+function trailerURL(f){
+  return "https://www.youtube.com/results?search_query="+encodeURIComponent(`${f.t} ${f.y} official trailer`);
+}
+function filmCardHTML(f,extra=""){
+  const noimg=!f.p;
+  return `<div class="film-card" role="button" tabindex="0" aria-label="Choose ${esc(f.t)} (${f.y})" data-id="${f.id}" ${extra}>
+    <div class="posterbox${noimg?" noimg":""}">
+      ${noimg?"":`<img src="${f.p}" width="500" height="750" alt="${esc(f.t)} poster" loading="lazy"
+           onerror="this.parentElement.classList.add('noimg')">`}
+      <div class="fallback">${esc(f.t)}</div>
+    </div>
+    <div class="film-meta">
+      <div class="t">${esc(f.t)}</div>
+      <div class="y">${f.y}</div>
+      <a class="trailer" href="${trailerURL(f)}" target="_blank" rel="noopener"
+         onclick="event.stopPropagation()">▶ Review the Evidence</a>
+    </div>
+  </div>`;
+}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function interstitial(roundLabel,line,cb){
+  $("interRound").textContent=roundLabel;
+  $("interLine").textContent=line;
+  const el=$("interstitial");
+  el.classList.add("on");
+  const done=()=>{el.classList.remove("on");el.removeEventListener("click",done);clearTimeout(h);cb&&cb()};
+  const h=setTimeout(done,3400);
+  el.addEventListener("click",done);
+}
+
+/* ══════════════════ HOME ══════════════════ */
+function renderHome(){
+  $("catGrid").innerHTML = CATEGORIES.map((c,i)=>`
+    <div class="cat-card" role="button" tabindex="0" aria-label="Judge the ${c.name} jury" data-cat="${c.key}">
+      <div class="idx">${String(i+1).padStart(2,"0")}</div>
+      <h3>${c.name}</h3>
+      <p>${c.desc}</p>
+      <div class="count">48 Films · Now in Session</div>
+    </div>`).join("");
+  $("catGrid").querySelectorAll(".cat-card").forEach(el=>{
+    el.addEventListener("click",()=>startCategory(el.dataset.cat));
+  });
+}
+function renderHomeArt(){
+  const all=Object.values(FILMS).flat().filter(f=>f.p);
+  if(!all.length)return;
+  const pick=n=>shuffle([...all]).slice(0,n);
+  // fan of 5 posters under the title, like a dealt hand
+  const rot=[-14,-7,0,7,14], ty=[18,6,0,6,18], tags=["EXHIBIT A","EXHIBIT B","EXHIBIT C","EXHIBIT D","EXHIBIT E"];
+  $("heroFan").innerHTML=pick(5).map((f,i)=>`
+    <div class="fp" style="--r:${rot[i]}deg;--ty:${ty[i]}px;z-index:${i<3?i+1:5-i}">
+      <span class="tag">${tags[i]}</span>
+      <img src="${f.p}" width="500" height="750" alt="">
+    </div>`).join("");
+  // scrolling shortlist marquee (content doubled for a seamless loop)
+  const row=pick(16).map(f=>`<div class="mq-poster"><img src="${f.p}" width="500" height="750" alt="" loading="lazy"></div>`).join("");
+  $("mqRow").innerHTML=row+row;
+}
+function startCategory(key){
+  if(!FILMS[key] || FILMS[key].length<48){ toast("The Committee regrets: this jury is not yet seated."); return; }
+  S=newState(key);
+  interstitial(`The ${S.cat.name} Jury`,
+    `You are hereby appointed judge of ${S.cat.name}. The Committee suggests you look confident.`,
+    ()=>{renderGroup(); show("screen-groups");});
+}
+
+/* ══════════════════ GROUP STAGE ══════════════════ */
+function renderGroup(){
+  const g=S.groups[S.groupIdx];
+  $("groupCatLine").textContent=`The ${S.cat.name} Jury · Preliminaries`;
+  $("groupTitle").textContent=`GROUP ${ROMANS[S.groupIdx]} OF XII`;
+  $("groupProgressText").textContent=`Panel ${S.groupIdx+1} of 12 · ${S.advanced.length} advanced`;
+  $("groupProgressFill").style.width=(S.groupIdx/12*100)+"%";
+  S.groupPicks.clear();
+  updateGroupBar();
+  const grid=$("groupGrid");
+  grid.innerHTML=g.map(f=>filmCardHTML(f)).join("");
+  grid.querySelectorAll(".film-card").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id=+el.dataset.id;
+      if(S.groupPicks.has(id)){S.groupPicks.delete(id);el.classList.remove("selected")}
+      else{
+        if(S.groupPicks.size>=2){toast("Two, and only two. The Committee is firm on arithmetic.");return}
+        S.groupPicks.add(id);el.classList.add("selected");
+      }
+      updateGroupBar();
+    });
+  });
+}
+function updateGroupBar(){
+  $("groupCounter").innerHTML=`<b>${S.groupPicks.size}</b> of 2 chosen`;
+  $("groupConfirm").disabled = S.groupPicks.size!==2;
+}
+$("groupConfirm").addEventListener("click",()=>{
+  const g=S.groups[S.groupIdx];
+  g.forEach(f=>{ (S.groupPicks.has(f.id)?S.advanced:S.eliminated).push(f); });
+  S.groupIdx++;
+  if(S.groupIdx<12){ renderGroup(); }
+  else{
+    interstitial("The Preliminaries Conclude",
+      "Twenty-four advance. Twenty-four are dismissed — though not all hope is lost for them.",
+      ()=>{renderRedemption(); show("screen-redemption");});
+  }
+});
+
+/* ══════════════════ REDEMPTION ══════════════════ */
+function renderRedemption(){
+  $("redCatLine").textContent=`The ${S.cat.name} Jury · An Act of Mercy`;
+  S.redPicks.clear(); updateRedBar();
+  const grid=$("redGrid");
+  grid.innerHTML=S.eliminated.map(f=>filmCardHTML(f)).join("");
+  grid.querySelectorAll(".film-card").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id=+el.dataset.id;
+      if(S.redPicks.has(id)){S.redPicks.delete(id);el.classList.remove("selected")}
+      else{
+        if(S.redPicks.size>=8){toast("Eight pardons. Mercy has a budget.");return}
+        S.redPicks.add(id);el.classList.add("selected");
+      }
+      updateRedBar();
+    });
+  });
+}
+function updateRedBar(){
+  $("redCounter").innerHTML=`<b>${S.redPicks.size}</b> of 8 pardoned`;
+  $("redConfirm").disabled = S.redPicks.size!==8;
+}
+$("redConfirm").addEventListener("click",()=>{
+  const revived=S.eliminated.filter(f=>S.redPicks.has(f.id));
+  S.bracket=shuffle([...S.advanced,...revived]);
+  S.roundSize=32; S.matchIdx=0; S.nextRound=[];
+  interstitial("The Bracket Is Drawn", ROUND_META[32].inter,
+    ()=>{renderDuel(); show("screen-duel");});
+});
+
+/* ══════════════════ KNOCKOUT ══════════════════ */
+function renderDuel(){
+  const meta=ROUND_META[S.roundSize];
+  const total=S.roundSize/2;
+  const a=S.bracket[S.matchIdx*2], b=S.bracket[S.matchIdx*2+1];
+  $("duelCatLine").textContent=`The ${S.cat.name} Jury`;
+  $("duelRoundTitle").textContent=meta.title;
+  $("duelProgressText").textContent=`Match ${S.matchIdx+1} of ${total}`;
+  $("duelProgressFill").style.width=(S.matchIdx/total*100)+"%";
+  const wrap=$("duelWrap");
+  wrap.innerHTML = filmCardHTML(a) + `<div class="vs-medal"><span>vs</span></div>` + filmCardHTML(b);
+  wrap.querySelectorAll(".film-card").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const winId=+el.dataset.id;
+      const win = winId===a.id?a:b, lose = winId===a.id?b:a;
+      if(!S.beaten.has(win.id)) S.beaten.set(win.id,[]);
+      S.beaten.get(win.id).push({round:S.roundSize,opp:lose});
+      S.nextRound.push(win);
+      S.matchIdx++;
+      if(S.matchIdx<total){ renderDuel(); }
+      else advanceRound();
+    });
+  });
+}
+function advanceRound(){
+  S.bracket=S.nextRound; S.nextRound=[]; S.matchIdx=0; S.roundSize=S.roundSize/2;
+  if(S.roundSize>=2){
+    const meta=ROUND_META[S.roundSize];
+    interstitial(meta.title, meta.inter, ()=>{renderDuel();});
+  }
+  if(S.roundSize<2){
+    S.champion=S.bracket[0];
+    startCeremony();
+  }
+}
+/* note: roundSize reaches 1 after the final — champion decided */
+
+/* ══════════════════ CEREMONY ══════════════════ */
+function startCeremony(){
+  show("screen-ceremony");
+  $("recap-panel").classList.remove("on");
+  $("ceremonyStage").style.display="";
+  ["announceLine","champWrap","crownCta","champTitle","champSub","speechBox","signBlock","ceremonyActions"]
+    .forEach(id=>$(id).classList.remove("on"));
+  $("judgeName").value="";
+  $("crownSvg").classList.remove("dropped");
+  $("particles").innerHTML="";
+  const c=S.champion;
+  $("champPosterFrame").innerHTML=`
+    <div class="posterbox${c.p?"":" noimg"}">
+      ${c.p?`<img src="${c.p}" width="500" height="750" alt="${esc(c.t)} poster" onerror="this.parentElement.classList.add('noimg')">`:""}
+      <div class="fallback">${esc(c.t)}</div>
+    </div>`;
+  $("champTitle").textContent=c.t;
+  $("champSub").textContent=`${c.y} · Diamond Winner · The ${S.cat.name} Jury`;
+  const stage=$("ceremonyStage");
+  stage.classList.remove("lit");
+  setTimeout(()=>{$("announceLine").classList.add("on")},400);
+  setTimeout(()=>{stage.classList.add("lit")},1400);
+  setTimeout(()=>{$("champWrap").classList.add("on")},1900);
+  setTimeout(()=>{$("crownCta").classList.add("on")},3400);
+}
+$("crownBtn").addEventListener("click",()=>{
+  $("crownCta").style.display="none";
+  $("crownSvg").classList.add("dropped");
+  spawnParticles();
+  setTimeout(()=>{
+    $("champTitle").classList.add("on");
+    $("champSub").classList.add("on");
+    const line=SPEECHES[Math.floor(Math.random()*SPEECHES.length)](S.champion.t);
+    $("speechBox").textContent=line;
+    $("speechBox").classList.add("on");
+  },900);
+  setTimeout(()=>{
+    $("signBlock").classList.add("on");
+    $("ceremonyActions").classList.add("on");
+  },1800);
+});
+$("judgeName").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();$("recapBtn").click();}
+});
+function spawnParticles(){
+  const box=$("particles");
+  for(let i=0;i<26;i++){
+    const s=document.createElement("i");
+    const ang=Math.random()*Math.PI*2, dist=60+Math.random()*130;
+    s.style.left="50%"; s.style.top="0px";
+    s.style.setProperty("--dx",Math.cos(ang)*dist+"px");
+    s.style.setProperty("--dy",(Math.sin(ang)*dist-40)+"px");
+    s.style.animationDelay=(0.55+Math.random()*0.4)+"s";
+    box.appendChild(s);
+  }
+}
+$("restartBtn").addEventListener("click",resetAll);
+$("restartBtn2").addEventListener("click",resetAll);
+function resetAll(){ S=null; show("screen-home"); }
+
+/* ══════════════════ RECAP: the Official Record — comic roadmap ══════════════════ */
+$("recapBtn").addEventListener("click",()=>{
+  S.judgeName=($("judgeName").value.trim()||"A Committee of One").slice(0,24);
+  $("ceremonyStage").style.display="none";
+  $("recap-panel").classList.add("on");
+  playRecap();
+});
+
+function championPath(){
+  const path=(S.beaten.get(S.champion.id)||[]).slice().sort((x,y)=>y.round-x.round);
+  return path.map(e=>({label:ROUND_SHORT[e.round],opp:e.opp}));
+}
+function loadPosterCORS(url){
+  // cache-bust so the CORS fetch never reuses the plain <img> cached copy (which lacks CORS headers)
+  return new Promise(res=>{
+    if(!url)return res(null);
+    const img=new Image();
+    img.crossOrigin="anonymous";
+    img.onload=()=>res(img);
+    img.onerror=()=>res(null);
+    img.src=url+(url.includes("?")?"&":"?")+"cors=1";
+  });
+}
+
+const CW=1080, CH=1440;
+const SERIF='"Instrument Serif",Georgia,serif';
+const SANS='"Archivo","Helvetica Neue",Helvetica,sans-serif';
+const GOLD="#E3C458", INK="#F2EEE2", RED="#E5432F";
+async function ensureFonts(){
+  try{
+    await Promise.all([
+      document.fonts.load(`900 64px ${SANS}`),
+      document.fonts.load(`800 20px ${SANS}`),
+      document.fonts.load(`italic 30px ${SERIF}`),
+      document.fonts.load(`400 34px ${SERIF}`)
+    ]);
+  }catch(e){/* fall back silently */}
+}
+
+function easeOut(t){return t<0?0:t>1?1:1-Math.pow(1-t,3)}
+function popBack(t){ // comic overshoot
+  if(t<=0)return 0; if(t>=1)return 1;
+  const c=1.9,x=t-1; return 1+(c+1)*x*x*x+c*x*x;
+}
+function drawTracked(ctx,text,x,y,tracking){
+  const widths=[...text].map(ch=>ctx.measureText(ch).width);
+  const total=widths.reduce((s,w)=>s+w,0)+tracking*(text.length-1);
+  let cx=x-total/2;
+  [...text].forEach((ch,i)=>{ctx.fillText(ch,cx+widths[i]/2,y);cx+=widths[i]+tracking});
+}
+function clipQuoted(ctx,s,px,maxW){
+  ctx.font=`400 ${px}px ${SERIF}`;
+  if(ctx.measureText(`“${s}”`).width<=maxW)return s;
+  while(s.length>3&&ctx.measureText(`“${s}…”`).width>maxW)s=s.slice(0,-1);
+  return s+"…";
+}
+function drawFrameBase(ctx){
+  ctx.fillStyle="#0D0D0B"; ctx.fillRect(0,0,CW,CH);
+  ctx.strokeStyle="rgba(242,238,226,0.30)"; ctx.lineWidth=2; ctx.strokeRect(40,40,CW-80,CH-80);
+  ctx.strokeStyle=GOLD; ctx.lineWidth=4;
+  const L=34,o=40;
+  [[o,o,1,1],[CW-o,o,-1,1],[o,CH-o,1,-1],[CW-o,CH-o,-1,-1]].forEach(([x,y,dx,dy])=>{
+    ctx.beginPath();ctx.moveTo(x,y+dy*L);ctx.lineTo(x,y);ctx.lineTo(x+dx*L,y);ctx.stroke();
+  });
+}
+function drawPosterRect(ctx,img,title,x,y,w,h){
+  ctx.save();
+  ctx.fillStyle=INK; ctx.fillRect(x-4,y-4,w+8,h+8); // white paper border, comic sticker style
+  if(img){
+    const ir=img.width/img.height,tr=w/h;
+    let sx=0,sy=0,sw=img.width,sh=img.height;
+    if(ir>tr){sw=sh*tr;sx=(img.width-sw)/2}else{sh=sw/tr;sy=(img.height-sh)/2}
+    ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);
+  }else{
+    ctx.fillStyle="#191914"; ctx.fillRect(x,y,w,h);
+    ctx.fillStyle=GOLD; ctx.textAlign="center"; ctx.textBaseline="middle";
+    let px=Math.max(14,Math.min(20,w/6));
+    ctx.font=`400 ${px}px ${SERIF}`;
+    let t=title;
+    while(t.length>3&&ctx.measureText(t).width>w-12)t=t.slice(0,-1);
+    ctx.fillText(t===title?t:t+"…",x+w/2,y+h/2);
+  }
+  ctx.restore();
+}
+function drawStar(ctx,x,y,rO,rI,spikes,color){
+  ctx.save();ctx.fillStyle=color;ctx.beginPath();
+  for(let i=0;i<spikes*2;i++){
+    const r=i%2?rI:rO,a=(i*Math.PI)/spikes-Math.PI/2;
+    ctx[i?"lineTo":"moveTo"](x+Math.cos(a)*r,y+Math.sin(a)*r);
+  }
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function drawCrownShape(ctx,cx,cy,w,alpha){
+  ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=GOLD;
+  const h=w*0.62,x=cx-w/2,y=cy-h/2;
+  ctx.beginPath();
+  ctx.moveTo(x+w*0.08,y+h*0.8);ctx.lineTo(x+w*0.04,y+h*0.26);ctx.lineTo(x+w*0.26,y+h*0.52);
+  ctx.lineTo(x+w*0.5,y+h*0.1);ctx.lineTo(x+w*0.74,y+h*0.52);ctx.lineTo(x+w*0.96,y+h*0.26);
+  ctx.lineTo(x+w*0.92,y+h*0.8);ctx.closePath();ctx.fill();
+  ctx.fillRect(x+w*0.08,y+h*0.8,w*0.84,h*0.13);
+  ctx.fillStyle="#FDF6DD";
+  ctx.beginPath();ctx.arc(cx,y+h*0.3,w*0.04,0,7);ctx.fill();
+  ctx.restore();
+}
+
+/* ---- roadmap geometry ---- */
+function routePoints(n){
+  const pts=[{x:CW/2,y:352}];
+  for(let i=0;i<n;i++)pts.push({x:i%2?748:332,y:430+i*134});
+  pts.push({x:CW/2,y:1080});
+  return pts;
+}
+function routeSegs(pts){
+  const segs=[];let total=0;
+  for(let i=1;i<pts.length;i++){
+    const a=pts[i-1],b=pts[i],L=Math.hypot(b.x-a.x,b.y-a.y);
+    segs.push({a,b,L,start:total});total+=L;
+  }
+  return {segs,total};
+}
+
+const RECAP_DUR=7.4, LINE_T0=0.8, LINE_T1=4.6;
+
+/* ---- certificate seal ---- */
+function circularText(ctx,text,r,font,color){
+  ctx.save();ctx.font=font;ctx.fillStyle=color;ctx.textAlign="center";ctx.textBaseline="middle";
+  const chars=[...text],step=(Math.PI*2)/chars.length;
+  chars.forEach((ch,i)=>{
+    const a=-Math.PI/2+i*step;
+    ctx.save();
+    ctx.translate(Math.cos(a)*r,Math.sin(a)*r);
+    ctx.rotate(a+Math.PI/2);
+    ctx.fillText(ch,0,0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+function drawSeal(ctx,t,name){
+  const e=easeOut(t);
+  const scale=1+(1-e)*0.75;           // presses down onto the paper
+  const alpha=Math.min(1,t*2.2);
+  const RSEAL="#C93A2B";
+  ctx.save();
+  ctx.translate(858,1268);
+  ctx.rotate(-0.21+(1-e)*0.12);
+  ctx.scale(scale,scale);
+  ctx.globalAlpha=alpha*0.94;
+  ctx.strokeStyle=RSEAL;ctx.lineWidth=5;
+  ctx.beginPath();ctx.arc(0,0,100,0,7);ctx.stroke();
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(0,0,88,0,7);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,54,0,7);ctx.stroke();
+  circularText(ctx,"THE OMYCA AWARD ✦ OFFICIAL RECORD ✦ ",71,`800 14px ${SANS}`,RSEAL);
+  ctx.fillStyle=RSEAL;ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`800 11px ${SANS}`;
+  drawTracked(ctx,"ADJUDICATED BY",0,-26,3);
+  let px=24;ctx.font=`italic ${px}px ${SERIF}`;
+  while(px>13&&ctx.measureText(name).width>92){px-=1;ctx.font=`italic ${px}px ${SERIF}`}
+  ctx.fillText(name,0,0);
+  const dateStr=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}).toUpperCase();
+  ctx.font=`800 9px ${SANS}`;
+  drawTracked(ctx,dateStr,0,26,2);
+  ctx.restore();
+}
+
+function drawRoadmap(ctx,t,assets){
+  const {path,champImg,oppImgs}=assets;
+  const pts=routePoints(path.length);
+  const {segs,total}=routeSegs(pts);
+  drawFrameBase(ctx);
+  ctx.textAlign="center";ctx.textBaseline="middle";
+
+  /* header */
+  const ha=easeOut(t/0.8);
+  ctx.save();ctx.globalAlpha=ha;
+  ctx.fillStyle="rgba(242,238,226,0.45)";
+  ctx.font=`800 20px ${SANS}`;
+  drawTracked(ctx,"THE OFFICIAL RECORD",CW/2,116,9);
+  ctx.fillStyle=INK;
+  ctx.font=`900 64px ${SANS}`;
+  ctx.fillText("THE OMYCA AWARD",CW/2,186);
+  ctx.fillStyle="rgba(242,238,226,0.6)";
+  ctx.font=`italic 30px ${SERIF}`;
+  ctx.fillText(`The ${S.cat.name} Jury · The Road to the Diamond`,CW/2,248);
+  ctx.font=`italic 24px ${SERIF}`;
+  ctx.fillStyle="rgba(242,238,226,0.42)";
+  ctx.fillText("Certified by a committee of one.",CW/2,296);
+  ctx.restore();
+
+  /* dashed route, drawn progressively */
+  const frac=Math.max(0,Math.min(1,(t-LINE_T0)/(LINE_T1-LINE_T0)));
+  if(frac>0){
+    ctx.save();
+    ctx.strokeStyle=GOLD;ctx.lineWidth=5;ctx.lineCap="round";ctx.setLineDash([2,17]);
+    let rem=frac*total;
+    ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+    for(const s of segs){
+      if(rem<=0)break;
+      const d=Math.min(1,rem/s.L);
+      ctx.lineTo(s.a.x+(s.b.x-s.a.x)*d,s.a.y+(s.b.y-s.a.y)*d);
+      rem-=s.L;
+    }
+    ctx.stroke();
+    // start dot
+    ctx.setLineDash([]);ctx.fillStyle=GOLD;
+    ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,9,0,7);ctx.fill();
+    ctx.fillStyle="rgba(242,238,226,0.45)";
+    ctx.font=`800 17px ${SANS}`;
+    drawTracked(ctx,"THE FIELD OF 48",CW/2,pts[0].y-28,6);
+    ctx.restore();
+  }
+
+  /* stops */
+  path.forEach((e,i)=>{
+    const p=pts[i+1];
+    const reach=LINE_T0+(LINE_T1-LINE_T0)*((segs[i].start+segs[i].L)/total);
+    const pop=popBack((t-reach)/0.45);
+    if(pop<=0)return;
+    const left=!(i%2); // node on left → text to the right
+    // mini poster, comic sticker tilt
+    ctx.save();ctx.translate(p.x,p.y);ctx.scale(pop,pop);ctx.rotate((left?-4:4)*Math.PI/180);
+    drawPosterRect(ctx,oppImgs[i],e.opp.t,-45,-67,90,134);
+    ctx.restore();
+    // node dot on the route
+    ctx.fillStyle="#0D0D0B";ctx.strokeStyle=GOLD;ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(p.x,p.y+82,8,0,7);ctx.stroke();
+    // text block
+    const tx=left?p.x+80:p.x-80;
+    ctx.save();ctx.globalAlpha=Math.min(1,pop);
+    ctx.textAlign=left?"left":"right";
+    ctx.fillStyle=GOLD;ctx.font=`800 20px ${SANS}`;
+    ctx.fillText(e.label.toUpperCase(),tx,p.y-34);
+    ctx.fillStyle=INK;
+    const name=clipQuoted(ctx,e.opp.t,34,326);
+    ctx.font=`400 34px ${SERIF}`;
+    const txt=`“${name}”`;
+    ctx.fillText(txt,tx,p.y+4);
+    const w=ctx.measureText(txt).width;
+    const x1=left?tx:tx-w;
+    const st=easeOut((t-reach-0.22)/0.35);
+    if(st>0){ // red strike, comic
+      ctx.strokeStyle=RED;ctx.lineWidth=4;ctx.lineCap="round";
+      ctx.beginPath();ctx.moveTo(x1,p.y+6);ctx.lineTo(x1+w*st,p.y+6);ctx.stroke();
+    }
+    ctx.fillStyle="rgba(242,238,226,0.4)";
+    ctx.font=`italic 22px ${SERIF}`;
+    ctx.fillText("dismissed with regret*",tx,p.y+40);
+    ctx.restore();
+    // OUT! stamp
+    const stampT=popBack((t-reach-0.3)/0.4);
+    if(stampT>0){
+      ctx.save();ctx.translate(p.x+(left?34:-34),p.y-52);ctx.rotate(left?-0.22:0.22);ctx.scale(stampT,stampT);
+      ctx.fillStyle="rgba(13,13,11,0.88)";
+      ctx.strokeStyle=RED;ctx.lineWidth=4;
+      ctx.fillRect(-46,-21,92,42);ctx.strokeRect(-46,-21,92,42);
+      ctx.fillStyle=RED;ctx.font=`900 26px ${SANS}`;ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText("OUT!",0,2);
+      ctx.restore();
+    }
+  });
+
+  /* champion */
+  const champ=S.champion;
+  const ca=popBack((t-4.7)/0.6);
+  if(ca>0){
+    const cx=CW/2, cy=1206;
+    ctx.save();ctx.translate(cx,cy);
+    ctx.rotate((1-easeOut((t-4.7)/0.9))*0.5);ctx.scale(ca,ca);
+    drawStar(ctx,0,0,196,130,12,"rgba(227,196,88,0.14)");
+    drawStar(ctx,0,0,166,112,12,"rgba(227,196,88,0.26)");
+    ctx.restore();
+    ctx.save();ctx.translate(cx,cy);ctx.scale(ca,ca);
+    drawPosterRect(ctx,champImg,champ.t,-80,-120,160,240);
+    ctx.restore();
+    const ct=easeOut((t-5.15)/0.5);
+    if(ct>0)drawCrownShape(ctx,cx,cy-120-28-(1-ct)*46,74,ct);
+    const bt=popBack((t-5.4)/0.6);
+    if(bt>0){
+      ctx.save();ctx.translate(cx,1354);ctx.scale(bt,bt);ctx.rotate(-0.015);
+      const label=`${champ.t.toUpperCase()} · ${champ.y}`;
+      let px=34;ctx.font=`900 ${px}px ${SANS}`;
+      while(px>20&&ctx.measureText(label).width>CW-340){px-=2;ctx.font=`900 ${px}px ${SANS}`}
+      const bw=Math.max(460,ctx.measureText(label).width+80);
+      ctx.fillStyle=GOLD;ctx.fillRect(-bw/2,-42,bw,84);
+      ctx.fillStyle="#141204";ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.font=`900 15px ${SANS}`;
+      drawTracked(ctx,"DIAMOND WINNER",0,-19,7);
+      ctx.font=`900 ${px}px ${SANS}`;
+      ctx.fillText(label,0,16);
+      ctx.restore();
+    }
+  }
+
+  /* the judge's seal, pressed onto the record */
+  const sealT=(t-6.35)/0.55;
+  if(sealT>0)drawSeal(ctx,Math.min(1,sealT),S.judgeName||"A Committee of One");
+}
+
+async function loadRecapAssets(){
+  if(S.recapAssets)return S.recapAssets;
+  const path=championPath();
+  const imgs=await Promise.all([loadPosterCORS(S.champion.p),...path.map(e=>loadPosterCORS(e.opp.p))]);
+  S.recapAssets={path,champImg:imgs[0],oppImgs:imgs.slice(1)};
+  return S.recapAssets;
+}
+async function playRecap(){
+  const canvas=$("recapCanvas"),ctx=canvas.getContext("2d");
+  await ensureFonts();
+  const assets=await loadRecapAssets();
+  if(S._recapRAF)cancelAnimationFrame(S._recapRAF);
+  const t0=performance.now();
+  const frame=now=>{
+    const t=Math.min((now-t0)/1000,RECAP_DUR);
+    drawRoadmap(ctx,t,assets);
+    if(t<RECAP_DUR)S._recapRAF=requestAnimationFrame(frame);
+  };
+  S._recapRAF=requestAnimationFrame(frame);
+}
+$("dlRecordBtn").addEventListener("click",async()=>{
+  await ensureFonts();
+  const assets=await loadRecapAssets();
+  const cv=document.createElement("canvas");cv.width=CW;cv.height=CH;
+  const ctx=cv.getContext("2d");
+  drawRoadmap(ctx,RECAP_DUR,assets);
+  const a=document.createElement("a");
+  a.href=cv.toDataURL("image/png");
+  a.download=`omyca-award-official-record-${slug(S.champion.t)}.png`;
+  a.click();
+});
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+
+/* ══════════════════ INIT ══════════════════ */
+// trailers must NEVER navigate this page away (game state lives in memory):
+// force a fresh tab via window.open, regardless of how the browser treats target=_blank
+document.addEventListener("click",e=>{
+  const a=e.target.closest&&e.target.closest("a.trailer");
+  if(!a)return;
+  e.preventDefault();e.stopPropagation();
+  const w=window.open(a.href,"_blank","noopener");
+  if(!w)toast("Your browser blocked the pop-up. The Committee suggests allowing it.");
+},true);
+// keyboard: Enter/Space activates role="button" cards
+document.addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ")&&e.target.getAttribute&&e.target.getAttribute("role")==="button"){
+    e.preventDefault(); e.target.click();
+  }
+});
+renderHome();
+renderHomeArt();
+</script>
+</body>
+</html>
