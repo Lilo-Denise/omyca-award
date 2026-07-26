@@ -10,6 +10,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,700;0,800;0,900;1,900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LZESLS1G79"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LZESLS1G79');
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,6 90,38 50,94 10,38' fill='%23d4af37'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -504,6 +512,11 @@ const SPEECHES = [
   t=>`“${t}” wins. The Academy could not be reached for comment, which is probably for the best.`
 ];
 
+/* ══════════════════ ANALYTICS ══════════════════ */
+function track(name,params){ // no-op if gtag is blocked or unavailable
+  try{ if(typeof gtag==="function") gtag("event",name,params||{}); }catch(e){}
+}
+
 /* ══════════════════ STATE ══════════════════ */
 let S = null;
 function newState(catKey){
@@ -598,6 +611,7 @@ function renderHomeArt(){
 function startCategory(key){
   if(!FILMS[key] || FILMS[key].length<48){ toast("The Committee regrets: this jury is not yet seated."); return; }
   S=newState(key);
+  track("select_category",{category:key});
   interstitial(`The ${S.cat.name} Jury`,
     `You are hereby appointed judge of ${S.cat.name}. The Committee suggests you look confident.`,
     ()=>{renderGroup(); show("screen-groups");});
@@ -711,6 +725,7 @@ function advanceRound(){
 
 /* ══════════════════ CEREMONY ══════════════════ */
 function startCeremony(){
+  track("champion_crowned",{category:S.cat.key,champion:S.champion.t});
   show("screen-ceremony");
   $("recap-panel").classList.remove("on");
   $("ceremonyStage").style.display="";
@@ -1088,6 +1103,7 @@ async function playRecap(){
   S._recapRAF=requestAnimationFrame(frame);
 }
 $("dlRecordBtn").addEventListener("click",async()=>{
+  track("record_downloaded",{category:S.cat.key,champion:S.champion.t});
   await ensureFonts();
   const assets=await loadRecapAssets();
   const cv=document.createElement("canvas");cv.width=CW;cv.height=CH;
