@@ -111,7 +111,10 @@ body{
   transition:background .22s,border-color .22s,transform .22s;
 }
 .cat-card .idx{font:900 .95rem var(--f-sans);color:var(--gold)}
-.cat-card h3{font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:36px 0 10px;color:var(--ink)}
+.cat-card h3{
+  font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:36px 0 10px;color:var(--ink);
+  font-size:clamp(1.05rem,5.6vw,1.35rem);overflow-wrap:break-word;
+}
 .cat-card p{font-family:var(--f-serif);font-style:italic;font-size:1rem;line-height:1.4;color:var(--muted);min-height:4.2em}
 .cat-card .count{margin-top:16px;font:700 .58rem var(--f-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
 .cat-card::after{
@@ -494,7 +497,7 @@ const CATEGORIES = [
   {key:"scifi",       name:"Sci-Fi",      roman:"IV",   desc:"Space, time, and other budgetary concerns."},
   {key:"horror",      name:"Horror",      roman:"V",    desc:"The Committee watched these through its fingers. For science."},
   {key:"romance",     name:"Romance",     roman:"VI",   desc:"Love, longing, and someone running through an airport."},
-  {key:"documentary", name:"Documentary", roman:"VII",  desc:"Entirely true, give or take an edit."},
+  {key:"documentary", name:"Non-Fiction", roman:"VII",  desc:"Entirely true, give or take an edit."},
   {key:"animation",   name:"Animation",   roman:"VIII", desc:"Drawings that made grown adults cry. Repeatedly."}
 ];
 
