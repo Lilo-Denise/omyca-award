@@ -107,16 +107,23 @@ body{
 .cat-card{
   min-width:0;position:relative;background:var(--panel);
   border:1px solid var(--line);
-  padding:20px 16px 18px;text-align:left;cursor:pointer;
+  padding:20px 16px 16px;text-align:left;cursor:pointer;
+  display:flex;flex-direction:column;
   transition:background .22s,border-color .22s,transform .22s;
 }
+@media(max-width:360px){.cat-card{padding-left:12px;padding-right:12px}}
 .cat-card .idx{font:900 .95rem var(--f-sans);color:var(--gold)}
 .cat-card h3{
   font:800 1.35rem/1.05 var(--f-sans);text-transform:uppercase;margin:36px 0 10px;color:var(--ink);
   font-size:clamp(1.05rem,5.6vw,1.35rem);overflow-wrap:break-word;
 }
-.cat-card p{font-family:var(--f-serif);font-style:italic;font-size:1rem;line-height:1.4;color:var(--muted);min-height:4.2em}
-.cat-card .count{margin-top:16px;font:700 .58rem var(--f-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.cat-card p{font-family:var(--f-serif);font-style:italic;font-size:1rem;line-height:1.4;color:var(--muted)}
+/* the meta line always hugs the bottom of the frame, so every card lines up */
+.cat-card .count{
+  margin-top:auto;padding-top:18px;
+  font:700 clamp(.5rem,2.5vw,.58rem) var(--f-sans);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);
+}
 .cat-card::after{
   content:"→";position:absolute;top:16px;right:16px;
   font:800 1.1rem var(--f-sans);color:var(--faint);
@@ -497,7 +504,7 @@ const CATEGORIES = [
   {key:"scifi",       name:"Sci-Fi",      roman:"IV",   desc:"Space, time, and other budgetary concerns."},
   {key:"horror",      name:"Horror",      roman:"V",    desc:"The Committee watched these through its fingers. For science."},
   {key:"romance",     name:"Romance",     roman:"VI",   desc:"Love, longing, and someone running through an airport."},
-  {key:"documentary", name:"Non-Fiction", roman:"VII",  desc:"Entirely true, give or take an edit."},
+  {key:"documentary", name:"Documentary", short:"Docs", roman:"VII",  desc:"Entirely true, give or take an edit."},
   {key:"animation",   name:"Animation",   roman:"VIII", desc:"Drawings that made grown adults cry. Repeatedly."}
 ];
 
@@ -591,9 +598,9 @@ function renderHome(){
   $("catGrid").innerHTML = CATEGORIES.map((c,i)=>`
     <div class="cat-card" role="button" tabindex="0" aria-label="Judge the ${c.name} jury" data-cat="${c.key}">
       <div class="idx">${String(i+1).padStart(2,"0")}</div>
-      <h3>${c.name}</h3>
+      <h3>${c.short||c.name}</h3>
       <p>${c.desc}</p>
-      <div class="count">48 Films · Now in Session</div>
+      <div class="count">48 Films · In Session</div>
     </div>`).join("");
   $("catGrid").querySelectorAll(".cat-card").forEach(el=>{
     el.addEventListener("click",()=>startCategory(el.dataset.cat));
