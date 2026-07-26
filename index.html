@@ -286,6 +286,9 @@ body{
 }
 .sign-block{margin:32px auto 0;max-width:340px;opacity:0;transition:opacity .9s ease}
 .sign-block.on{opacity:1}
+.sign-block.nudge{animation:nudge .55s}
+.sign-block.nudge #judgeName{border-bottom-color:var(--red)}
+@keyframes nudge{0%,100%{transform:none}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
 .sign-block label{display:block;margin-bottom:10px}
 #judgeName{
   width:100%;background:transparent;border:none;border-bottom:1px solid var(--gold);
@@ -452,7 +455,7 @@ body{
       <div class="speech" id="speechBox"></div>
       <div class="sign-block" id="signBlock">
         <label class="smallcaps" for="judgeName">The presiding judge, for the record</label>
-        <input id="judgeName" name="judge-name" type="text" maxlength="24" placeholder="Your name, your honour…" autocomplete="off" spellcheck="false">
+        <input id="judgeName" name="judge-name" type="text" maxlength="24" placeholder="Your name, your honour…" autocomplete="off" spellcheck="false" required aria-required="true">
       </div>
       <div class="ceremony-actions" id="ceremonyActions">
         <button class="btn btn-gold" id="recapBtn">Review the Road to Glory</button>
@@ -786,7 +789,15 @@ function resetAll(){ S=null; show("screen-home"); }
 
 /* ══════════════════ RECAP: the Official Record — comic roadmap ══════════════════ */
 $("recapBtn").addEventListener("click",()=>{
-  S.judgeName=($("judgeName").value.trim()||"A Committee of One").slice(0,24);
+  const name=$("judgeName").value.trim();
+  if(!name){
+    toast("The record cannot go unsigned. The Committee insists.");
+    $("signBlock").classList.add("nudge");
+    setTimeout(()=>$("signBlock").classList.remove("nudge"),650);
+    $("judgeName").focus();
+    return;
+  }
+  S.judgeName=name.slice(0,24);
   $("ceremonyStage").style.display="none";
   $("recap-panel").classList.add("on");
   playRecap();
