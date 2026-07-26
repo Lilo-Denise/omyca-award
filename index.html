@@ -97,41 +97,75 @@ body{
 .ticker-track span::after{content:"✦";color:var(--gold);position:absolute;right:-8px;top:-1px}
 @keyframes marquee{to{transform:translateX(-50%)}}
 
-.hero-note{
-  max-width:560px;margin:40px auto 0;text-align:center;color:var(--muted);
-  font-family:var(--f-serif);font-size:clamp(1.15rem,3.6vw,1.5rem);line-height:1.35;
+.hero-note{max-width:640px;margin:44px auto 0;text-align:center}
+.hero-note .hl1{
+  font-family:var(--f-serif);font-style:italic;color:var(--muted);
+  font-size:clamp(1.05rem,3.2vw,1.35rem);
 }
-.hero-note em{color:var(--ink);font-style:italic}
+.hero-note .hl2{
+  font:900 clamp(1.6rem,6.4vw,3rem)/1.05 var(--f-sans);text-transform:uppercase;
+  letter-spacing:-.02em;color:var(--ink);margin-top:14px;
+}
+.hero-note .hl2 b{font-weight:900;font-variant-numeric:tabular-nums}
+.hero-note .n-out{color:var(--red)}
+.hero-note .n-win{color:var(--gold)}
+.hero-note .hl3{
+  position:relative;display:inline-block;margin-top:18px;color:var(--gold);
+  font-family:var(--f-serif);font-style:italic;font-size:clamp(1.3rem,4.4vw,1.9rem);
+}
+.hero-note .squiggle{
+  display:block;width:100%;height:10px;margin-top:2px;color:var(--gold);opacity:.85;
+}
 
 /* ---------- how it works ---------- */
-/* deliberately unboxed and quiet — this is a legend, not a set of buttons */
-.howto{margin-top:52px;text-align:center}
+/* ---------- how it works: a top-to-bottom flow that draws itself ---------- */
+.howto{margin-top:58px;text-align:center}
 .howto-kicker{color:var(--faint)}
-.howto-grid{
-  list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:22px 26px;margin-top:22px;
+.flow{list-style:none;max-width:430px;margin:26px auto 0}
+.fstep{
+  position:relative;padding-bottom:44px;
+  opacity:0;transform:translateY(10px);
+  transition:opacity .45s ease,transform .45s ease;
 }
-@media(max-width:760px){.howto-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}}
-.step{text-align:left;min-width:0;border-top:1px solid var(--line);padding-top:12px}
-.step .n{
-  font:900 .88rem/1 var(--f-sans);color:var(--gold);margin-right:7px;
+.howto.play .fstep{opacity:1;transform:none;transition-delay:var(--ds)}
+.fstep::after{ /* dashed connector down to the next step */
+  content:"";position:absolute;left:calc(50% - 1px);bottom:6px;width:2px;height:32px;
+  background:repeating-linear-gradient(180deg,var(--gold) 0 5px,transparent 5px 11px);
+  transform:scaleY(0);transform-origin:top;transition:transform .4s linear;
+}
+.howto.play .fstep::after{transform:scaleY(1);transition-delay:var(--d)}
+.ficon{width:48px;height:48px;margin:0 auto 10px;color:var(--gold)}
+.ficon svg{width:100%;height:100%;display:block}
+.fstep h4{
+  font:800 .74rem/1.2 var(--f-sans);text-transform:uppercase;letter-spacing:.14em;color:var(--ink);
+}
+.fstep h4 .n{
+  display:inline-block;color:var(--gold);margin-right:8px;
   font-variant-numeric:tabular-nums;
 }
-.step h4{
-  display:inline;font:800 .68rem/1.2 var(--f-sans);text-transform:uppercase;letter-spacing:.1em;
-  color:var(--muted);
+.fstep p{font-family:var(--f-serif);font-size:1.02rem;line-height:1.35;color:var(--muted);margin-top:8px}
+.flow-end{height:26px;position:relative}
+.flow-end .tip{
+  position:absolute;left:50%;top:0;transform:translateX(-50%) scale(0);
+  color:var(--gold);font-size:.8rem;
+  transition:transform .3s cubic-bezier(.34,1.5,.5,1);
 }
-.step p{font-family:var(--f-serif);font-size:.98rem;line-height:1.3;color:var(--faint);margin-top:7px}
+.howto.play .flow-end .tip{transform:translateX(-50%) scale(1);transition-delay:2.85s}
 
 /* ---------- category grid ---------- */
-.cat-heading{text-align:center;margin:64px 0 0}
-.cta-line{color:var(--gold);letter-spacing:.28em}
+.cat-heading{text-align:center;margin:18px 0 0}
+.start-plaque{
+  display:inline-block;background:var(--gold);color:var(--bg);
+  font:900 clamp(1rem,4.4vw,1.5rem)/1 var(--f-sans);text-transform:uppercase;letter-spacing:.2em;
+  padding:15px 24px 13px;
+  opacity:0;transform:scale(.88) rotate(-1.5deg);
+  transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.5,.5,1);
+}
+.cat-heading.play .start-plaque{opacity:1;transform:rotate(-1.5deg);transition-delay:3.1s}
 .cta-head{
   font:900 clamp(1.5rem,5.4vw,2.4rem)/1 var(--f-sans);text-transform:uppercase;
-  letter-spacing:-.02em;color:var(--ink);margin-top:12px;
+  letter-spacing:-.02em;color:var(--ink);margin-top:20px;
 }
-.cta-arrow{color:var(--gold);font:800 1.1rem var(--f-sans);margin-top:14px;animation:bob 2s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(5px);opacity:1}}
 .cat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}
 @media(max-width:860px){.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cat-card{
@@ -400,24 +434,68 @@ body{
       <span>No critics</span><span>No juries</span><span>1 judge — you, evidently</span><span>48 films</span><span>1 diamond</span><span>Taste: questionable</span><span>Verdict: final</span><span>Dress code: optional</span>
     </div></div>
 
-    <p class="hero-note">
-      It's a World Cup bracket, for films. <em>48 films in, 1 diamond out</em> — and you are the only judge.
-    </p>
+    <div class="hero-note">
+      <p class="hl1">It's a World Cup bracket — for films.</p>
+      <p class="hl2"><b class="n-out">48</b> films in, <b class="n-win">1</b> diamond out.</p>
+      <p class="hl3">And you are the only judge.
+        <svg class="squiggle" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M3 8c30-7 60 5 92-1s58-6 102 2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      </p>
+    </div>
 
-    <section class="howto">
+    <section class="howto" id="howto">
       <div class="smallcaps howto-kicker">How it works · about 5 minutes</div>
-      <ol class="howto-grid">
-        <li class="step"><span class="n">1</span><h4>Pick a category</h4><p>1 of 8. Its 48 films get shortlisted.</p></li>
-        <li class="step"><span class="n">2</span><h4>Group stage</h4><p>12 groups of 4. You advance 2 from each.</p></li>
-        <li class="step"><span class="n">3</span><h4>Redemption</h4><p>Revive 8 of the 24 you cut. The bracket is 32.</p></li>
-        <li class="step"><span class="n">4</span><h4>Knockout</h4><p>32 → 16 → 8 → 4 → 2 → 1. Crown it, sign it, download it.</p></li>
+      <ol class="flow">
+        <li class="fstep" style="--ds:0s;--d:.35s">
+          <div class="ficon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round">
+              <rect x="5" y="7" width="16" height="13" rx="2"/><rect x="27" y="7" width="16" height="13" rx="2"/>
+              <rect x="5" y="27" width="16" height="13" rx="2"/><rect x="27" y="27" width="16" height="13" rx="2" fill="currentColor"/>
+            </g><path d="M33 33l3 3 4-5" fill="none" stroke="#0D0D0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h4><span class="n">1</span>Pick a category</h4>
+          <p>1 of 8. Its 48 films get shortlisted.</p>
+        </li>
+        <li class="fstep" style="--ds:.7s;--d:1.05s">
+          <div class="ficon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="9" height="26" rx="1.6" fill="currentColor" stroke="none"/>
+              <rect x="15" y="11" width="9" height="26" rx="1.6"/>
+              <rect x="27" y="11" width="9" height="26" rx="1.6" fill="currentColor" stroke="none"/>
+              <rect x="39" y="11" width="9" height="26" rx="1.6"/>
+              <path d="M4.6 23.5l2.4 2.4 3.6-4.6" stroke="#0D0D0B"/><path d="M28.6 23.5l2.4 2.4 3.6-4.6" stroke="#0D0D0B"/>
+            </g></svg>
+          </div>
+          <h4><span class="n">2</span>Group stage</h4>
+          <p>12 groups of 4. You advance 2 from each.</p>
+        </li>
+        <li class="fstep" style="--ds:1.4s;--d:1.75s">
+          <div class="ficon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="7" y="17" width="15" height="22" rx="2"/>
+              <path d="M14.5 17V9"/><path d="M10 11.5h9"/>
+              <path d="M34 39V17m0 0l-6 6m6-6l6 6"/>
+              <path d="M41 9l1.6 3.4L46 14l-3.4 1.6L41 19l-1.6-3.4L36 14l3.4-1.6z" fill="currentColor" stroke="none"/>
+            </g></svg>
+          </div>
+          <h4><span class="n">3</span>Redemption</h4>
+          <p>Revive 8 of the 24 you cut. The bracket is 32.</p>
+        </li>
+        <li class="fstep last" style="--ds:2.1s;--d:2.45s">
+          <div class="ficon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 9h7v11h7"/><path d="M4 39h7V28h7"/><path d="M18 24h6"/>
+            </g><path d="M35 12l9 10-9 14-9-14z" fill="currentColor"/></svg>
+          </div>
+          <h4><span class="n">4</span>Knockout</h4>
+          <p>32 → 16 → 8 → 4 → 2 → 1. Crown it, sign it, download it.</p>
+        </li>
       </ol>
+      <div class="flow-end" aria-hidden="true"><span class="tip">▼</span></div>
     </section>
 
-    <div class="cat-heading">
-      <div class="smallcaps cta-line">Start here</div>
+    <div class="cat-heading" id="catHeading">
+      <div class="start-plaque">Start Here</div>
       <h2 class="cta-head">Choose <span class="goldtext">1</span> category to judge</h2>
-      <div class="cta-arrow" aria-hidden="true">↓</div>
     </div>
     <div class="cat-grid" id="catGrid"></div>
 
@@ -1191,6 +1269,18 @@ document.addEventListener("keydown",e=>{
 });
 renderHome();
 renderHomeArt();
+// draw the how-it-works flow when it scrolls into view (once)
+(function(){
+  const targets=[$("howto"),$("catHeading")];
+  const play=()=>targets.forEach(t=>t&&t.classList.add("play"));
+  if(!("IntersectionObserver"in window)){play();return}
+  const io=new IntersectionObserver(entries=>{
+    if(entries.some(e=>e.isIntersecting)){play();io.disconnect();clearTimeout(safety)}
+  },{threshold:.2});
+  io.observe($("howto"));
+  // safety net: never leave the steps stuck invisible if the observer never fires
+  const safety=setTimeout(()=>{play();io.disconnect()},4000);
+})();
 </script>
 </body>
 </html>
